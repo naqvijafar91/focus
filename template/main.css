@@ -1,0 +1,136 @@
+html, body {
+    height: 100%;
+	margin: 0px;
+}
+#container {
+    height: 100%;
+    position: relative;
+}
+#folders {
+    height: 100%;
+    position:absolute;
+    width: 25%;
+    background:#f6f9f9;
+}
+
+#main {
+    position:absolute;
+    left: 25%;
+    width: 70%;
+    height: 100%;
+}
+
+#pusher {
+    height: 15%;
+    text-align: center;
+}
+
+#pusher-form {
+    align-self: center;
+    position: relative;
+    top:40%;
+    /* width: 70%; */
+}
+
+.pusher-input {
+    width:80%;
+    border-radius: 20px;
+    padding:6px;
+    border: solid;
+    border-width: 0.5px;
+    border-color: gray;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    background: #f6f9f9;
+}
+
+.pusher-input:focus {
+    outline:none;
+}
+
+#lists {
+    height: 85%;
+}
+
+
+ul {
+        display: block;
+        list-style-type: none;
+        margin-top: 2em;
+        margin-bottom: 1 em;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 10px;
+      
+}
+
+li {
+    padding : 10px;
+}
+
+li:hover {
+    background:#f0f5f5;
+    cursor: pointer;
+}
+.remaining-tasks {
+    float: right;
+    padding-right: 10px;
+    font-size: 0.85em;
+}
+
+#add-folder {
+    margin-left: 40%;
+    position: relative;
+    top: 20px;
+    font-size: 1.5em;
+    padding-right: 10px;
+    padding-left: 10px;
+    
+}
+
+#add-folder:hover {
+    background:#e0ebeb;
+    cursor: pointer;
+}
+
+.due-date {
+    position: relative;
+    right: 8%;
+}
+
+.due-date:hover {
+    cursor: pointer;
+
+}
+
+input[type="checkbox"]{
+    width: 15px; /*Desired width*/
+    height: 15px; /*Desired height*/
+}
+
+input[type="checkbox"]:hover{
+    cursor: pointer;
+}
+
+.due-date-inside-todo {
+float: right;
+}
+
+.due-date-text {
+    float: right;
+    margin-right: 2%;
+    font-size: 0.85em;
+}
+
+.time-left-for-task {
+        position: relative;
+        top: 15px;
+        left: -160px;
+        font-size: smaller;
+        color: gray;
+}
+
+#lists ul li {
+    height: 30px;
+}
