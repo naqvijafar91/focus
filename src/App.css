@@ -1,17 +1,4 @@
-
-
-html, body {
-  height: 100%;
-  margin: 0px;
-}
-
 #container {
   height: 100%;
   position: relative;
-}
-#folders {
-  height: 100%;
-  position:absolute;
-  width: 25%;
-  background:#f6f9f9;
 }

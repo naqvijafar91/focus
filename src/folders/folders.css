@@ -1,0 +1,47 @@
+#folders {
+    height: 100%;
+    position:absolute;
+    width: 25%;
+    background:#f6f9f9;
+  }
+
+  #add-folder {
+    margin-left: 40%;
+    position: relative;
+    top: 20px;
+    font-size: 1.5em;
+    padding-right: 10px;
+    padding-left: 10px;
+    
+}
+
+#add-folder:hover {
+    background:#e0ebeb;
+    cursor: pointer;
+}
+
+ul {
+    display: block;
+    list-style-type: none;
+    margin-top: 2em;
+    margin-bottom: 1 em;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 10px;
+  
+}
+
+li {
+padding : 10px;
+}
+
+li:hover {
+background:#f0f5f5;
+cursor: pointer;
+}
+
+.remaining-tasks {
+    float: right;
+    padding-right: 10px;
+    font-size: 0.85em;
+}
