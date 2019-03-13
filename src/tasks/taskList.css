@@ -1,0 +1,45 @@
+#lists {
+    height: 85%;
+}
+
+
+.due-date {
+    position: relative;
+    right: 8%;
+}
+
+.due-date:hover {
+    cursor: pointer;
+
+}
+
+input[type="checkbox"]{
+    width: 15px; /*Desired width*/
+    height: 15px; /*Desired height*/
+}
+
+input[type="checkbox"]:hover{
+    cursor: pointer;
+}
+
+.due-date-inside-todo {
+float: right;
+}
+
+.due-date-text {
+    float: right;
+    margin-right: 2%;
+    font-size: 0.85em;
+}
+
+.time-left-for-task {
+        position: relative;
+        top: 15px;
+        left: -160px;
+        font-size: smaller;
+        color: gray;
+}
+
+#lists ul li {
+    height: 30px;
+}
