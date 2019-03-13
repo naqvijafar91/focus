@@ -11,19 +11,25 @@ class Tasks extends Component {
         this.state={
             tasks : ['Task 1','Task 2','Task 3','Task 4']
         }
+        this.onNewTaskAdded = this.onNewTaskAdded.bind(this);
     }
 
     onNewTaskAdded(taskToBeAdded) {
         console.log(taskToBeAdded);
+        this.setState({
+            tasks : [...this.state.tasks,taskToBeAdded]
+        });
+       
     }
     render() {
+        const tasks = this.state.tasks;
         return (
             <div id="main">
             <Helmet>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
             </Helmet>
                 <AddTask onNewTaskAdded={this.onNewTaskAdded}/>
-                <TaskList/>
+                <TaskList tasks={tasks}/>
             </div>
         );
     }
