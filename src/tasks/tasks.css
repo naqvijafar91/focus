@@ -5,34 +5,6 @@
     height: 100%;
 }
 
-#pusher {
-    height: 15%;
-    text-align: center;
-}
-
-#pusher-form {
-    align-self: center;
-    position: relative;
-    top:40%;
-    /* width: 70%; */
-}
-
-.pusher-input {
-    width:80%;
-    border-radius: 20px;
-    padding:6px;
-    border: solid;
-    border-width: 0.5px;
-    border-color: gray;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 20px;
-    background: #f6f9f9;
-}
-
-.pusher-input:focus {
-    outline:none;
-}
 
 #lists {
     height: 85%;

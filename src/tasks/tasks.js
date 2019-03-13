@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './tasks.css';
 import {Helmet} from "react-helmet";
+import AddTask from './addTask';
 
 class Tasks extends Component {
     render() {
@@ -9,13 +10,7 @@ class Tasks extends Component {
             <Helmet>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
             </Helmet>
-                <div id="pusher">
-                    <form id="pusher-form">
-                        <input class="pusher-input" placeholder="What do you want to do?" type="text" name="lname" />
-                        <i class="due-date fa fa-calendar-o"></i>
-                        <br />
-                    </form>
-                </div>
+                <AddTask/>
                 <div id="lists">
                     <ul>
                         <li>
