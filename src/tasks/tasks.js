@@ -35,7 +35,7 @@ class Tasks extends Component {
 
     }
     render() {
-        const tasks = this.state.tasks;
+        const tasks = this.props.tasks;
         return (
             <div id="main">
                 <AddTask onNewTaskAdded={this.onNewTaskAdded} />

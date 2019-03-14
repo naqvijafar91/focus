@@ -41,6 +41,7 @@ class Folders extends Component {
     }
 
     handleFolderNameChange(folderID, newValue) {
+        //@Todo: Perform an API request to the backend
         const updatedFolders = this.state.folders.map((folder) => {
             if (folder.id == folderID)
                 folder.name = newValue;
