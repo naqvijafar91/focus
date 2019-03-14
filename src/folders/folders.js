@@ -23,18 +23,23 @@ class Folders extends Component {
                 }
             ]
         };
+
+        this.enableFolderNameEditor = this.enableFolderNameEditor.bind(this);
     }
 
-    enableFolderNameEditor() {
+    enableFolderNameEditor(folderID) {
         // Hide that span and make input for that folder visible
+        console.log(folderID);
+        this.setState({['hideName'+folderID]:true,['showInput'+folderID]:true});
     }
 
     render() {
         const folders = this.state.folders.map((folder) => {
-            return <li>
+            return <li key={folder.id}>
                 <div>
-                    <span>{folder.name}</span>
-                    <i class="fa fa-pencil rename-folder-icon" aria-hidden="true"></i>
+                    <span className={this.state['hideName'+folder.id]?'hidden':'folder-name-text'}>{folder.name}</span>
+                    <input value={folder.name} className={this.state['showInput'+folder.id]?'edit-folder-name-input':'hidden'} type="text"/>
+                    <i onClick={()=>this.enableFolderNameEditor(folder.id)}class="fa fa-pencil rename-folder-icon" aria-hidden="true"></i>
                     <span class="remaining-tasks">{folder.remaining_tasks}</span>
                 </div>
             </li>

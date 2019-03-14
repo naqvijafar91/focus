@@ -56,3 +56,10 @@ cursor: pointer;
 .rename-folder-icon:hover {
   color: black;
 }
+
+.edit-folder-name-input {
+    width: 60%;
+}
+.hidden {
+    display: none;
+}
