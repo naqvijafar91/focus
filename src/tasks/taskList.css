@@ -24,22 +24,34 @@ input[type="checkbox"]:hover{
 
 .due-date-inside-todo {
 float: right;
+position: relative;
+top: -45px;
 }
 
 .due-date-text {
     float: right;
+    position: relative;
+    top: -45px;
     margin-right: 2%;
     font-size: 0.85em;
 }
 
 .time-left-for-task {
         position: relative;
-        top: 15px;
-        left: -160px;
+        top: -30px;
+        left: 25px;
         font-size: smaller;
         color: gray;
+        
 }
 
 #lists ul li {
     height: 30px;
+}
+
+.todos {
+    position: relative;
+    float: clear;
+    top: -23px;
+    left: 30px;
 }

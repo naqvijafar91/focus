@@ -9,7 +9,7 @@ class Tasks extends Component {
     constructor(props,context) {
         super(props,context);
         this.state={
-            tasks : ['Task 1','Task 2','Task 3','Task 4']
+            tasks : ['Task 1 to be done','Task 2','Task 3','Task 4']
         }
         this.onNewTaskAdded = this.onNewTaskAdded.bind(this);
     }

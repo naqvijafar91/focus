@@ -16,6 +16,7 @@ class AddTask extends Component {
     handleSubmit(event) {
         event.preventDefault();
         this.props.onNewTaskAdded(this.state.taskToBeAdded);
+        this.setState({taskToBeAdded:''});
       }
     render() {
         return(
