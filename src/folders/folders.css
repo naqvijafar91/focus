@@ -48,8 +48,11 @@ cursor: pointer;
 
 .rename-folder-icon {
     float: right;
-    font-size: 0.75em;
     margin-right: 5px;
     margin-top: 3px;
     color:gray;
+}
+
+.rename-folder-icon:hover {
+  color: black;
 }
