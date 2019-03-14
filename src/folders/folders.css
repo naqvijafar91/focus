@@ -45,3 +45,11 @@ cursor: pointer;
     padding-right: 10px;
     font-size: 0.85em;
 }
+
+.rename-folder-icon {
+    float: right;
+    font-size: 0.75em;
+    margin-right: 5px;
+    margin-top: 3px;
+    color:gray;
+}
