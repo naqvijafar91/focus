@@ -8,23 +8,27 @@ class TaskList extends Component {
         this.handleTaskCompleted = this.handleTaskCompleted.bind(this);
     }
     handleTaskCompleted(event) {
-        if(event.target.checked) {
+        if (event.target.checked) {
             // @todo:Hit api and remove it from UI
             this.props.onTaskCompleted(event.target.name);
         }
     }
     render() {
-        var listItems = this.props.tasks.map((taskItem) =>
-            <li key={taskItem.id}>
+        var listItems = this.props.tasks.map((taskItem) => {
+            const displayDueDate = !taskItem.dueDate || taskItem.dueDate == '' ? false : true; 
+            const formattedDueDate = displayDueDate ? taskItem.dueDate.toDateString() : '';
+            return <li key={taskItem.id}>
                 <div>
                     <input type="checkbox" name={taskItem.id}
-                         onChange={this.handleTaskCompleted}/>
+                        onChange={this.handleTaskCompleted} />
                     <div className="todos">{taskItem.task}</div>
-                    <i className="due-date-inside-todo fa fa-calendar"></i>
-                    <span className="due-date-text">02-04-2019</span>
+                    <i className={displayDueDate?"due-date-inside-todo fa fa-calendar":'hidden'}></i>
+                    <i className={displayDueDate?'hidden':"due-date-inside-todo fa fa-calendar-o"}></i>
+                    <span className="due-date-text">{formattedDueDate}</span>
                     <span className="time-left-for-task">~30m</span>
                 </div>
-            </li>);
+            </li>
+        });
 
         return (
             <div id="lists">
