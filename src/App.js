@@ -14,7 +14,6 @@ class App extends Component {
     this.state = {
       data: [
         {
-
           id: 1,
           name: 'Inbox',
           remaining_tasks: 13,
@@ -48,28 +47,29 @@ class App extends Component {
     this.onNewFolderSelected = this.onNewFolderSelected.bind(this);
     this.handleFolderNameChange = this.handleFolderNameChange.bind(this);
     this.updateFolderName = this.updateFolderName.bind(this);
+    this.addDummyFolderItem = this.addDummyFolderItem.bind(this);
   }
 
   handleFolderNameChange(folderID, newValue) {
     //@Todo: Perform an API request to the backend
     const updatedData = this.state.data.map((folder) => {
-        if (folder.id == folderID)
-            folder.name = newValue;
-        return folder;
+      if (folder.id == folderID)
+        folder.name = newValue;
+      return folder;
     });
     this.setState({ data: updatedData });
   }
 
   //@Todo:Perform an api hit
   updateFolderName(folderID) {
-    console.log('Performing API HIT to update folder name .... with ID '+folderID);
+    console.log('Performing API HIT to update folder name .... with ID ' + folderID);
   }
 
   onNewFolderSelected(folderID) {
-    for(var i=0;i<this.state.data.length;i++) {
+    for (var i = 0; i < this.state.data.length; i++) {
       const folder = this.state.data[i];
-      if(folder.id == folderID) {
-        this.setState({currentFolderIndexSelected : i});
+      if (folder.id == folderID) {
+        this.setState({ currentFolderIndexSelected: i });
         return;
       }
     }
@@ -96,6 +96,27 @@ class App extends Component {
     newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: 100, task: taskToBeAdded }];
     this.setState(newState);
   }
+
+  /**
+   * This function is used as a 1st step to add a new folder
+   * @Todo : Perform API hit to create a dummy folder named New Folder
+   */
+  addDummyFolderItem(notifyChildComponentWithNewID) {
+    const newState = Object.assign({}, this.state);
+    // newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: 100, task: taskToBeAdded }];
+    // @Todo : We will get the id from backend
+    // console.log(new);
+    newState.data.push({
+      id: 100,
+      name: 'New Folder',
+      remaining_tasks: 0,
+      tasks: []
+    });
+    this.setState(newState,function(){
+      notifyChildComponentWithNewID(100);
+    });
+  }
+
   render() {
     const currentSelectedFolderTasks = this.state.data[this.state.currentFolderIndexSelected].tasks;
     return (
@@ -104,9 +125,10 @@ class App extends Component {
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
         </Helmet>
         <Folders data={this.state.data}
-        updateFolderName={this.updateFolderName}
-        handleFolderNameChange={this.handleFolderNameChange}
-         onNewFolderSelected={this.onNewFolderSelected} />
+          addDummyFolderItem={this.addDummyFolderItem}
+          updateFolderName={this.updateFolderName}
+          handleFolderNameChange={this.handleFolderNameChange}
+          onNewFolderSelected={this.onNewFolderSelected} />
         <Tasks tasks={currentSelectedFolderTasks}
           onNewTaskAdded={this.onNewTaskAdded}
           onTaskCompleted={this.onTaskCompleted} />

@@ -8,6 +8,7 @@ class Folders extends Component {
         this.enableFolderNameEditorMode = this.enableFolderNameEditorMode.bind(this);
         this.disableFolderEditorMode = this.disableFolderEditorMode.bind(this);       
         this.handleFolderNameSubmit = this.handleFolderNameSubmit.bind(this);
+        this.addNewFolder = this.addNewFolder.bind(this);
     }
 
     enableFolderNameEditorMode(folderID) {
@@ -28,6 +29,15 @@ class Folders extends Component {
         this.props.updateFolderName(folderID);
     }
 
+    addNewFolder() {
+        let self = this;
+        // Notify parent to add a dummy folder item and 
+        // enable editor mode for that id
+        this.props.addDummyFolderItem(function(newFolderID){
+            self.enableFolderNameEditorMode(newFolderID);
+        });
+     }
+
 
     render() {
         const folders = this.props.data.map((folder) => {
@@ -46,7 +56,7 @@ class Folders extends Component {
 
         return (
             <div id="folders">
-                <span id="add-folder">+</span>
+                <span onClick={()=>this.addNewFolder()} id="add-folder">+</span>
                 <ul>{folders}</ul>
             </div>
         );
