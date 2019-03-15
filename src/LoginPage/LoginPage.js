@@ -19,6 +19,9 @@ class LoginPage extends Component {
         this.handleRegistrationEmailChange = this.handleRegistrationEmailChange.bind(this);
         this.handleRegistrationPasswordChange = this.handleRegistrationPasswordChange.bind(this);
         this.handleSubmitLogin = this.handleSubmitLogin.bind(this);
+        this.handleSubmitRegister = this.handleSubmitRegister.bind(this);
+        this.showRegistrationForm = this.showRegistrationForm.bind(this);
+        this.hideRegistrationForm = this.hideRegistrationForm.bind(this);
     }
 
     handleLoginEmailChange(event) {
@@ -51,26 +54,36 @@ class LoginPage extends Component {
         this.props.history.push('/');
     }
 
+    showRegistrationForm(event) {
+        event.preventDefault();
+        this.setState({showRegistrationForm : true});
+    }
+
+    hideRegistrationForm(event) {
+        event.preventDefault();
+        this.setState({showRegistrationForm : false});
+    }
+
     render() {
         return (
             <div id="login-page-container">
                 <div class="login-page">
                     <div class="form">
-                        <form class="register-form" onSubmit={this.handleSubmitRegister}>
+                        <form className={this.state.showRegistrationForm ? "register-form" : "hidden"} onSubmit={this.handleSubmitRegister}>
                             <input type="email" placeholder="email" value={this.state.registration_email}
                                 onChange={this.handleRegistrationEmailChange} />
                             <input type="password" placeholder="password" value={this.state.registration_password}
                                 onChange={this.handleRegistrationPasswordChange} />
-                            <button>create</button>
-                            <p class="message">Already registered? <a href="#">Sign In</a></p>
+                            <button>create account</button>
+                            <p class="message">Already registered? <a href="#" onClick={this.hideRegistrationForm}>Sign In</a></p>
                         </form>
-                        <form class="login-form" onSubmit={this.handleSubmitLogin}>
+                        <form className={this.state.showRegistrationForm?'hidden':"login-form"} onSubmit={this.handleSubmitLogin}>
                             <input type="email" placeholder="email" value={this.login_email}
                                 onChange={this.handleLoginEmailChange} />
                             <input type="password" placeholder="password" value={this.login_password}
                                 onChange={this.handleLoginPasswordChange} />
                             <button>login</button>
-                            <p class="message">Not registered? <a href="#">Create an account</a></p>
+                            <p class="message">Not registered? <a href="#" onClick={this.showRegistrationForm}>Create an account</a></p>
                         </form>
                     </div>
                 </div>
