@@ -4,6 +4,7 @@ import './newLoginPage.css';
 class LoginPage extends Component {
     render() {
         return (
+            <div id="login-page-container">
             <div class="login-page">
                 <div class="form">
                     <form class="register-form">
@@ -20,6 +21,7 @@ class LoginPage extends Component {
                         <p class="message">Not registered? <a href="#">Create an account</a></p>
                     </form>
                 </div>
+            </div>
             </div>
         );
     }

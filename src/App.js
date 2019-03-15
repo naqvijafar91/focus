@@ -121,7 +121,7 @@ class App extends Component {
     const currentSelectedFolderTasks = this.state.data[this.state.currentFolderIndexSelected].tasks;
     const currentSelectedFolderID = this.state.data[this.state.currentFolderIndexSelected].id;
     return (
-      <div id="container">
+      <div id="app-container">
         <Helmet>
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
         </Helmet>
