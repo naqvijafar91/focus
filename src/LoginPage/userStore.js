@@ -1,5 +1,6 @@
 function Store(){
     // Load user from localstorage and set value of isAuthenticated
+    this.key= "focus-app-user";
 
     if(JSON.parse(localStorage.getItem("focus-app-user"))) {
         
@@ -10,10 +11,14 @@ function Store(){
 
 }
 
+Store.prototype.deleteUser = function() {
+    localStorage.removeItem(this.key);
+};
+
 Store.prototype.saveUser=function(user) {
     this.user=user;
     localStorage.setItem("focus-app-user", JSON.stringify(this.user));
-    console.log(this)
+    // console.log(this)
     this.isAuthenticated=true;
 }
 

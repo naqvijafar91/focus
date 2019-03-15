@@ -1,0 +1,9 @@
+#logout-text {
+    float: right;
+    margin-top:10px;
+}
+
+#logout-text:hover {
+    font-weight:bold;
+    cursor: pointer;
+}

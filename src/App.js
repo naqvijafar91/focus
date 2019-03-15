@@ -6,6 +6,7 @@ import FolderItem from './folders/folderItem';
 import Folders from './folders/folders';
 import Tasks from './tasks/tasks';
 import Helmet from 'react-helmet';
+import UserStore from './LoginPage/userStore';
 
 class App extends Component {
   constructor(props, context) {
@@ -48,6 +49,7 @@ class App extends Component {
     this.handleFolderNameChange = this.handleFolderNameChange.bind(this);
     this.updateFolderName = this.updateFolderName.bind(this);
     this.addDummyFolderItem = this.addDummyFolderItem.bind(this);
+    this.onLogout = this.onLogout.bind(this);
   }
 
   handleFolderNameChange(folderID, newValue) {
@@ -112,9 +114,14 @@ class App extends Component {
       remaining_tasks: 0,
       tasks: []
     });
-    this.setState(newState,function(){
+    this.setState(newState, function () {
       notifyChildComponentWithNewID(100);
     });
+  }
+
+  onLogout() {
+    UserStore.deleteUser();
+    this.props.history.push('/signin');
   }
 
   render() {
@@ -126,12 +133,13 @@ class App extends Component {
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
         </Helmet>
         <Folders data={this.state.data}
-          currentSelectedFolderID ={currentSelectedFolderID}
+          currentSelectedFolderID={currentSelectedFolderID}
           addDummyFolderItem={this.addDummyFolderItem}
           updateFolderName={this.updateFolderName}
           handleFolderNameChange={this.handleFolderNameChange}
           onNewFolderSelected={this.onNewFolderSelected} />
         <Tasks tasks={currentSelectedFolderTasks}
+          onLogout={this.onLogout}
           onNewTaskAdded={this.onNewTaskAdded}
           onTaskCompleted={this.onTaskCompleted} />
       </div>
