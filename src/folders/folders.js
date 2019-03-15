@@ -51,6 +51,7 @@ class Folders extends Component {
     render() {
         const folders = this.props.data.map((folder) => {
             return <li key={folder.id} 
+            className={this.props.currentSelectedFolderID == folder.id?'highlight-selected-folder':''}
             onMouseEnter={()=>this.showEditButtonForFolder(folder.id)}
             onMouseLeave={()=>this.hideEditButtonForFolder(folder.id)}
             onClick={()=>this.props.onNewFolderSelected(folder.id)}>

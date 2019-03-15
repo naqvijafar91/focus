@@ -2,7 +2,7 @@
     height: 100%;
     position:absolute;
     width: 25%;
-    background:#f6f9f9;
+    /* background:#f6f9f9; */
   }
 
   #add-folder {
@@ -33,6 +33,10 @@ ul {
 
 li {
 padding : 10px;
+}
+
+.highlight-selected-folder {
+    background:#f0f5f5;
 }
 
 li:hover {
