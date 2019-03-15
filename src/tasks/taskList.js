@@ -20,7 +20,7 @@ class TaskList extends Component {
                     <input type="checkbox" name={taskItem.id}
                          onChange={this.handleTaskCompleted}/>
                     <div className="todos">{taskItem.task}</div>
-                    <i className="due-date-inside-todo fa fa-calendar-o"></i>
+                    <i className="due-date-inside-todo fa fa-calendar"></i>
                     <span className="due-date-text">02-04-2019</span>
                     <span className="time-left-for-task">~30m</span>
                 </div>
@@ -45,7 +45,7 @@ class TaskItem extends Component {
                 <div>
                     <input type="checkbox" name="vehicle" value="Bike" />
                     <span class="todos">Task one two three four</span>
-                    <i class="due-date-inside-todo fa fa-calendar-o"></i>
+                    <i class="due-date-inside-todo fa fa-calendar"></i>
                     <span class="due-date-text">02-04-2019</span>
                     <span class="time-left-for-task">~30m</span>
                 </div>
