@@ -24,7 +24,7 @@ class AddTask extends Component {
             <form id="pusher-form" onSubmit={this.handleSubmit}>
                 <input className="pusher-input" value={this.state.taskToBeAdded} onChange={this.handleChange}
                 placeholder="What do you want to do?" type="text" name="lname" />
-                <i class="due-date fa fa-calendar-o"></i>
+                <i className="due-date fa fa-calendar-o"></i>
                 <br />
             </form>
         </div>

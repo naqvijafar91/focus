@@ -9,6 +9,8 @@ class Folders extends Component {
         this.disableFolderEditorMode = this.disableFolderEditorMode.bind(this);       
         this.handleFolderNameSubmit = this.handleFolderNameSubmit.bind(this);
         this.addNewFolder = this.addNewFolder.bind(this);
+        this.showEditButtonForFolder = this.showEditButtonForFolder.bind(this);
+        this.hideEditButtonForFolder = this.hideEditButtonForFolder.bind(this);
     }
 
     enableFolderNameEditorMode(folderID) {
@@ -38,18 +40,29 @@ class Folders extends Component {
         });
      }
 
+    showEditButtonForFolder(folderID) {
+        this.setState({ ['showEditButton' + folderID]: true});
+    }
+
+    hideEditButtonForFolder(folderID) {
+        this.setState({ ['showEditButton' + folderID]: false});
+    }
 
     render() {
         const folders = this.props.data.map((folder) => {
-            return <li key={folder.id} onClick={()=>this.props.onNewFolderSelected(folder.id)}>
+            return <li key={folder.id} 
+            onMouseEnter={()=>this.showEditButtonForFolder(folder.id)}
+            onMouseLeave={()=>this.hideEditButtonForFolder(folder.id)}
+            onClick={()=>this.props.onNewFolderSelected(folder.id)}>
                 <div>
                     <span className={this.state['hideName' + folder.id] ? 'hidden' : 'folder-name-text'}>{folder.name}</span>
                     <form onSubmit={(event)=>this.handleFolderNameSubmit(event,folder.id)} className={this.state['showInput' + folder.id]
                             ? 'edit-folder-name-input' : 'hidden'}>
                         <input onChange={(event) => this.props.handleFolderNameChange(folder.id, event.target.value)} value={folder.name}  type="text" />
                     </form>
-                    <i onClick={() => this.enableFolderNameEditorMode(folder.id)} class="fa fa-pencil rename-folder-icon" aria-hidden="true"></i>
-                    <span class="remaining-tasks">{folder.remaining_tasks}</span>
+                    <i onClick={() => this.enableFolderNameEditorMode(folder.id)} 
+                        className={this.state['showEditButton'+folder.id]?"fa fa-pencil rename-folder-icon":'hidden'} aria-hidden="true"></i>
+                    <span className="remaining-tasks">{folder.remaining_tasks}</span>
                 </div>
             </li>
         });

@@ -19,10 +19,10 @@ class TaskList extends Component {
                 <div>
                     <input type="checkbox" name={taskItem.id}
                          onChange={this.handleTaskCompleted}/>
-                    <div class="todos">{taskItem.task}</div>
-                    <i class="due-date-inside-todo fa fa-calendar-o"></i>
-                    <span class="due-date-text">02-04-2019</span>
-                    <span class="time-left-for-task">~30m</span>
+                    <div className="todos">{taskItem.task}</div>
+                    <i className="due-date-inside-todo fa fa-calendar-o"></i>
+                    <span className="due-date-text">02-04-2019</span>
+                    <span className="time-left-for-task">~30m</span>
                 </div>
             </li>);
 
