@@ -8,7 +8,7 @@ class AddTask extends Component {
         super(props, context);
         this.state = {
             taskToBeAdded: '',
-            date: new Date(),
+            date: '',
             showCalendar : false
         };
         this.handleChange = this.handleChange.bind(this);
@@ -26,7 +26,7 @@ class AddTask extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.onNewTaskAdded(this.state.taskToBeAdded);
+        this.props.onNewTaskAdded(this.state.taskToBeAdded,this.state.date);
         this.setState({ taskToBeAdded: '' });
     }
 
@@ -67,16 +67,18 @@ class AddTask extends Component {
 
     render() {
         const date = this.state.date;
+        const dueDateFilled = this.state.date == '' ? false : true;
         return (
             <div id="pusher">
                 <form ref={this.setWrapperRef} id="pusher-form" onSubmit={this.handleSubmit}>
                     <input className="pusher-input" value={this.state.taskToBeAdded} onChange={this.handleChange}
                         placeholder="What do you want to do?" type="text" name="lname" />
-                        <span className="add-task-due-date-text">{date.toDateString()}</span>
-                    <i onClick={()=>this.toggleCalendarVisibility()} className="due-date fa fa-calendar-o"></i>
+                        <span className="add-task-due-date-text">{date==''?'':date.toDateString()}</span>
+                    <i onClick={()=>this.toggleCalendarVisibility()} className={dueDateFilled ? "hidden" : 'due-date fa fa-calendar-o'}></i>
+                    <i onClick={()=>this.toggleCalendarVisibility()} className={dueDateFilled ? "due-date fa fa-calendar" : 'hidden'}></i>
                     <Calendar className={this.state.showCalendar?'add-task-calendar':'hidden'}
                      onChange={this.onDueDateChanged}
-                        value={this.state.date} onBlur={this.hideCalendar}/>
+                        value={date==''?new Date():date}/>
                     <br />
                 </form>
             </div>

@@ -91,7 +91,7 @@ class App extends Component {
     this.setState(newState);
   }
 
-  onNewTaskAdded(taskToBeAdded) {
+  onNewTaskAdded(taskToBeAdded,dueDate) {
     console.log(taskToBeAdded + ' From App.js adding newTask');
     //Update our state
     const newState = Object.assign({}, this.state);
