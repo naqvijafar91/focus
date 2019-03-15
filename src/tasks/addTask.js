@@ -73,7 +73,7 @@ class AddTask extends Component {
                 <form ref={this.setWrapperRef} id="pusher-form" onSubmit={this.handleSubmit}>
                     <input className="pusher-input" value={this.state.taskToBeAdded} onChange={this.handleChange}
                         placeholder="What do you want to do?" type="text" name="lname" />
-                        <span className="add-task-due-date-text">{date==''?'':date.toDateString()}</span>
+                        <span className="add-task-due-date-text">{dueDateFilled ?date.toDateString():''}</span>
                     <i onClick={()=>this.toggleCalendarVisibility()} className={dueDateFilled ? "hidden" : 'due-date fa fa-calendar-o'}></i>
                     <i onClick={()=>this.toggleCalendarVisibility()} className={dueDateFilled ? "due-date fa fa-calendar" : 'hidden'}></i>
                     <Calendar className={this.state.showCalendar?'add-task-calendar':'hidden'}
