@@ -33,3 +33,11 @@
     right: 0%;
     margin-right:15%;
 }
+
+.add-task-due-date-text {
+    float: right;
+    position: absolute;
+    right:24%;
+    top: 20%;
+    font-size: 0.85em;
+}
