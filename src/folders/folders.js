@@ -4,28 +4,9 @@ class Folders extends Component {
 
     constructor(props, context) {
         super(props, context);
-        this.state = {
-            folders: [
-                {
-                    id: 1,
-                    name: 'Inbox',
-                    remaining_tasks: 13
-                },
-                {
-                    id: 2,
-                    name: 'Grocery',
-                    remaining_tasks: 1234
-                },
-                {
-                    id: 3,
-                    name: 'Work',
-                    remaining_tasks: 2
-                }
-            ]
-        };
-
-        this.enableFolderNameEditor = this.enableFolderNameEditorMode.bind(this);
-        this.disableFolderEditorMode = this.disableFolderEditorMode.bind(this);
+        this.state={};
+        this.enableFolderNameEditorMode = this.enableFolderNameEditorMode.bind(this);
+        this.disableFolderEditorMode = this.disableFolderEditorMode.bind(this);       
         this.handleFolderNameSubmit = this.handleFolderNameSubmit.bind(this);
     }
 
@@ -35,35 +16,27 @@ class Folders extends Component {
     }
 
     disableFolderEditorMode() {
-        this.state.folders.map((folder)=>{
-            this.setState({ ['hideName' + folder.id]: false, ['showInput' + folder.id]: false });
+        this.props.data.map((folder)=>{
+            this.setState({['hideName' + folder.id]: false, ['showInput' + folder.id]: false });
         });
     }
 
-    handleFolderNameChange(folderID, newValue) {
-        //@Todo: Perform an API request to the backend
-        const updatedFolders = this.state.folders.map((folder) => {
-            if (folder.id == folderID)
-                folder.name = newValue;
-            return folder;
-        });
-        this.setState({ folders: updatedFolders });
-    }
-
-    handleFolderNameSubmit(event) {
+    handleFolderNameSubmit(event,folderID) {
         event.preventDefault();
         // Now disable edit mode 
         this.disableFolderEditorMode();
+        this.props.updateFolderName(folderID);
     }
 
+
     render() {
-        const folders = this.state.folders.map((folder) => {
-            return <li key={folder.id}>
+        const folders = this.props.data.map((folder) => {
+            return <li key={folder.id} onClick={()=>this.props.onNewFolderSelected(folder.id)}>
                 <div>
                     <span className={this.state['hideName' + folder.id] ? 'hidden' : 'folder-name-text'}>{folder.name}</span>
-                    <form onSubmit={this.handleFolderNameSubmit} className={this.state['showInput' + folder.id]
+                    <form onSubmit={(event)=>this.handleFolderNameSubmit(event,folder.id)} className={this.state['showInput' + folder.id]
                             ? 'edit-folder-name-input' : 'hidden'}>
-                        <input onChange={(event) => this.handleFolderNameChange(folder.id, event.target.value)} value={folder.name}  type="text" />
+                        <input onChange={(event) => this.props.handleFolderNameChange(folder.id, event.target.value)} value={folder.name}  type="text" />
                     </form>
                     <i onClick={() => this.enableFolderNameEditorMode(folder.id)} class="fa fa-pencil rename-folder-icon" aria-hidden="true"></i>
                     <span class="remaining-tasks">{folder.remaining_tasks}</span>

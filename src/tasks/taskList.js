@@ -8,7 +8,6 @@ class TaskList extends Component {
         this.handleTaskCompleted = this.handleTaskCompleted.bind(this);
     }
     handleTaskCompleted(event) {
-        console.log(event.target.name);
         if(event.target.checked) {
             // @todo:Hit api and remove it from UI
             this.props.onTaskCompleted(event.target.name);
