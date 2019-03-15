@@ -26,3 +26,10 @@
 .pusher-input:focus {
     outline:none;
 }
+
+.add-task-calendar {
+    z-index: 100;
+    position: absolute;
+    right: 0%;
+    margin-right:15%;
+}
