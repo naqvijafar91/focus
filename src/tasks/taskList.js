@@ -25,7 +25,7 @@ class TaskList extends Component {
                     <i className={displayDueDate?"due-date-inside-todo fa fa-calendar":'hidden'}></i>
                     <i className={displayDueDate?'hidden':"due-date-inside-todo fa fa-calendar-o"}></i>
                     <span className="due-date-text">{formattedDueDate}</span>
-                    <span className="time-left-for-task">~30m</span>
+                    <span className="time-left-for-task hidden">~30m</span>
                 </div>
             </li>
         });
