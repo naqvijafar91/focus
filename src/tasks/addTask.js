@@ -27,7 +27,7 @@ class AddTask extends Component {
     handleSubmit(event) {
         event.preventDefault();
         this.props.onNewTaskAdded(this.state.taskToBeAdded,this.state.date);
-        this.setState({ taskToBeAdded: '' });
+        this.setState({ taskToBeAdded: '', date:'' });
     }
 
     showCalendar() {
