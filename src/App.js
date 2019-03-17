@@ -18,10 +18,10 @@ class App extends Component {
           id: 1,
           name: 'Inbox',
           remaining_tasks: 13,
-          tasks: [{ id: 1, task: 'Task 1 to be done', dueDate:'' },
-          { id: 2, task: 'Task 2', dueDate :new Date() }, 
-          { id: 3, task: 'Task 3' , dueDate : new Date()},
-          { id: 4, task: 'Task 4' , dueDate : ''}]
+          tasks: [{ id: 1, task: 'Task 1 to be done', dueDate: '' },
+          { id: 2, task: 'Task 2', dueDate: new Date() },
+          { id: 3, task: 'Task 3', dueDate: new Date() },
+          { id: 4, task: 'Task 4', dueDate: '' }]
         },
         {
 
@@ -45,6 +45,7 @@ class App extends Component {
     };
 
     this.onTaskCompleted = this.onTaskCompleted.bind(this);
+    this.onTaskDueDateChanged = this.onTaskDueDateChanged.bind(this);
     this.onNewTaskAdded = this.onNewTaskAdded.bind(this);
     this.onNewFolderSelected = this.onNewFolderSelected.bind(this);
     this.handleFolderNameChange = this.handleFolderNameChange.bind(this);
@@ -92,11 +93,29 @@ class App extends Component {
     this.setState(newState);
   }
 
-  onNewTaskAdded(taskToBeAdded,dueDate) {
+  onTaskDueDateChanged(taskID, dueDate) {
+
+    //@Todo : Hit the task update API
+
+    // Loop through the tasks array and remove task with this id
+    const updatedTasksForCurrentSelectedFolder = this.state.data[this.state.currentFolderIndexSelected].tasks.map((taskItem) => {
+      if (taskItem.id == taskID)
+        taskItem.dueDate = dueDate;
+      return taskItem;
+    });
+
+    console.log(updatedTasksForCurrentSelectedFolder);
+    //Update our state
+    const newState = Object.assign({}, this.state);
+    newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
+    this.setState(newState);
+  }
+
+  onNewTaskAdded(taskToBeAdded, dueDate) {
     console.log(taskToBeAdded + ' From App.js adding newTask');
     //Update our state
     const newState = Object.assign({}, this.state);
-    newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: 100, task: taskToBeAdded, dueDate:dueDate }];
+    newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: 100, task: taskToBeAdded, dueDate: dueDate }];
     this.setState(newState);
   }
 
@@ -141,6 +160,7 @@ class App extends Component {
           onNewFolderSelected={this.onNewFolderSelected} />
         <Tasks tasks={currentSelectedFolderTasks}
           onLogout={this.onLogout}
+          onTaskDueDateChanged={this.onTaskDueDateChanged}
           onNewTaskAdded={this.onNewTaskAdded}
           onTaskCompleted={this.onTaskCompleted} />
       </div>

@@ -17,7 +17,9 @@ class Tasks extends Component {
             <div id="main">
                 <Logout onLogout={this.props.onLogout}/>
                 <AddTask onNewTaskAdded={this.props.onNewTaskAdded} />
-                <TaskList tasks={tasks} onTaskCompleted={this.props.onTaskCompleted} />
+                <TaskList tasks={tasks} 
+                onTaskDueDateChanged={this.props.onTaskDueDateChanged}
+                onTaskCompleted={this.props.onTaskCompleted} />
             </div>
         );
     }
