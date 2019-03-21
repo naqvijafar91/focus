@@ -10,9 +10,9 @@ type UserService interface {
 	Create(user *User) (*User, error)
 }
 
-type userService struct {
+type DummyUserService struct {
 }
 
-func (us *userService) Create(user *User) (*User, error) {
+func (us *DummyUserService) Create(user *User) (*User, error) {
 	return &User{ID: 22, Email: user.Email, Password: user.Password}, nil
 }
