@@ -37,7 +37,6 @@ func (th *TaskHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 		"tasks": tasks})
 }
 
-//@todo 
 func (th *TaskHandler) MarkCompleted(w http.ResponseWriter, req *http.Request) {
 
 }
@@ -46,8 +45,18 @@ func NewTaskHandler(ts focus.TaskService) *TaskHandler {
 	return &TaskHandler{ts}
 }
 
+func (th *TaskHandler) handleTaskRoutes(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case http.MethodGet:
+		th.GetAll(w, req)
+		break
+	case http.MethodPost:
+		th.Create(w, req)
+		break
+	}
+}
+
 func (th *TaskHandler) RegisterFolderRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/task", th.Create)
-	mux.HandleFunc("/task/all", th.GetAll)
-	// mux.HandleFunc("/folder/all", fh.GetAll)
+	mux.HandleFunc("/task", th.handleTaskRoutes)
+	mux.HandleFunc("/task/complete", th.MarkCompleted)
 }

@@ -60,8 +60,20 @@ func NewFolderHandler(fs focus.FolderService) *FolderHandler {
 	return &FolderHandler{fs}
 }
 
+func (fh *FolderHandler) handleFolderRoute(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case http.MethodGet:
+		fh.GetAll(w, req)
+		break
+	case http.MethodPost:
+		fh.Create(w, req)
+		break
+	case http.MethodPut:
+		fh.Update(w, req)
+		break
+	}
+}
+
 func (fh *FolderHandler) RegisterFolderRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/folder", fh.Create)
-	mux.HandleFunc("/folder/update", fh.Update)
-	mux.HandleFunc("/folder/all", fh.GetAll)
+	mux.HandleFunc("/folder", fh.handleFolderRoute)
 }

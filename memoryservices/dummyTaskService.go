@@ -17,22 +17,25 @@ func (dts *DummyTaskService) Create(task *focus.Task) (*focus.Task, error) {
 }
 
 func (dts *DummyTaskService) Update(task *focus.Task) (*focus.Task, error) {
-	for _, taskInStore := range dts.tasks {
-		if taskInStore.ID == task.ID {
-			taskInStore = task
+	for i := 0; i < len(dts.tasks); i++ {
+		if task.ID == dts.tasks[i].ID {
+			dts.tasks[i] = task
+			return dts.tasks[i], nil
 		}
 	}
 	return task, nil
 }
 
 func (dts *DummyTaskService) MarkAsComplete(taskID string) (*focus.Task, error) {
-	var completedTask *focus.Task
-	for _, taskInStore := range dts.tasks {
-		if taskInStore.ID == taskID {
-			taskInStore.CompletedDate = time.Now()
+	var foundTask *focus.Task
+	for i := 0; i < len(dts.tasks); i++ {
+		if taskID == dts.tasks[i].ID {
+			dts.tasks[i].CompletedDate = time.Now()
+			foundTask = dts.tasks[i]
+			return foundTask, nil
 		}
 	}
-	return completedTask, nil
+	return foundTask, nil
 }
 
 func (dts *DummyTaskService) GetAll() ([]*focus.Task, error) {
