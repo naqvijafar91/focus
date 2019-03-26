@@ -44,6 +44,11 @@ func (fh *FolderHandler) Update(w http.ResponseWriter, req *http.Request) {
 		"folder": savedFolder})
 }
 
+func (fh *FolderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"folder": fh.folderService})
+}
+
 func NewFolderHandler(fs FolderService) *FolderHandler {
 	return &FolderHandler{fs}
 }

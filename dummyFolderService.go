@@ -13,9 +13,19 @@ func (dfs *DummyFolderService) Create(folder *Folder) (*Folder, error) {
 }
 
 func (dfs *DummyFolderService) Update(folder *Folder) (*Folder, error) {
+	for _, folderInStore := range dfs.folders {
+		if folder.ID == folderInStore.ID {
+			folderInStore = folder
+		}
+	}
 	return folder, nil
 }
 
 func (dfs *DummyFolderService) UpdateByID(ID string, folder *Folder) (*Folder, error) {
-	return folder, nil
+	folder.ID = ID
+	return dfs.Update(folder)
+}
+
+func (dfs *DummyFolderService) GetAll() (*Folder,error) {
+	return dfs.folders,nil
 }
