@@ -38,7 +38,14 @@ func (th *TaskHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 }
 
 func (th *TaskHandler) MarkCompleted(w http.ResponseWriter, req *http.Request) {
-
+	req.ParseForm()
+	taskID := req.Form["taskID"][0]
+	completedTask, err := th.taskService.MarkAsComplete(taskID)
+	if err != nil {
+		fmt.Fprintf(w, "Its an error %s", err)
+		return
+	}
+	json.NewEncoder(w).Encode(completedTask)
 }
 
 func NewTaskHandler(ts focus.TaskService) *TaskHandler {
@@ -56,7 +63,7 @@ func (th *TaskHandler) handleTaskRoutes(w http.ResponseWriter, req *http.Request
 	}
 }
 
-func (th *TaskHandler) RegisterFolderRoutes(mux *http.ServeMux) {
+func (th *TaskHandler) RegisterTaskRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/task", th.handleTaskRoutes)
 	mux.HandleFunc("/task/complete", th.MarkCompleted)
 }

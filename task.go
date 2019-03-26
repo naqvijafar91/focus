@@ -1,6 +1,8 @@
 package focus
 
-import "time"
+import (
+	"time"
+)
 
 type Task struct {
 	ID            string
@@ -11,5 +13,6 @@ type Task struct {
 
 type TaskService interface {
 	Create(task *Task) (*Task, error)
-	GetAll() (*Task, error)
+	GetAll() ([]*Task, error)
+	MarkAsComplete(taskID string) (*Task, error)
 }
