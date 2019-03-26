@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -7,15 +7,11 @@ import (
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/naqvijafar91/focus"
 )
 
-type userLoginRequest struct {
-	Email    string
-	Password string
-}
-
 type Handlers struct {
-	userService UserService
+	userService focus.UserService
 }
 
 //@Todo:Find a way to properly handle errors
@@ -25,7 +21,7 @@ func (handlers *Handlers) sendError(w http.ResponseWriter, err error) {
 
 func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
-	var userLoginReq *userLoginRequest
+	var userLoginReq *focus.User
 	err := decoder.Decode(&userLoginReq)
 	if err != nil {
 		fmt.Fprintf(w, "Its an error %s", err)
@@ -57,7 +53,7 @@ func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
 
 func (handlers *Handlers) userRegistration(w http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
-	var user *User
+	var user *focus.User
 	err := decoder.Decode(&user)
 	if err != nil {
 		fmt.Fprintf(w, "Its an error %s", err)
@@ -82,11 +78,11 @@ func (handlers *Handlers) userRegistration(w http.ResponseWriter, req *http.Requ
 		"user":  savedUser})
 }
 
-func NewHandler(userService UserService) *Handlers {
+func NewHandler(userService focus.UserService) *Handlers {
 	return &Handlers{userService}
 }
 
-func (handlers *Handlers) registerUserRoutes(mux *http.ServeMux) {
+func (handlers *Handlers) RegisterUserRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/user/register", handlers.userRegistration)
 	mux.HandleFunc("/user/login", handlers.userLogin)
 }

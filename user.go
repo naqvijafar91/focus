@@ -1,4 +1,4 @@
-package main
+package focus
 
 type User struct {
 	ID       string

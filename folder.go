@@ -1,4 +1,4 @@
-package main
+package focus
 
 type Folder struct {
 	ID     string
@@ -10,4 +10,5 @@ type FolderService interface {
 	Create(folder *Folder) (*Folder, error)
 	Update(folder *Folder) (*Folder, error)
 	UpdateByID(ID string, folder *Folder) (*Folder, error)
+	GetAll() ([]*Folder, error)
 }
