@@ -35,6 +35,10 @@ func withUserParsing(next http.HandlerFunc) http.HandlerFunc {
 		fmt.Println("Middleware called")
 		//Get jwt token from headers
 		splitToken := strings.Split(req.Header.Get("Authorization"), "Bearer ")
+		if len(splitToken) < 2 {
+			fmt.Fprintln(w, "No token provided")
+			return
+		}
 		jwtTokenString := splitToken[1]
 		token, err := jwt.Parse(jwtTokenString, func(token *jwt.Token) (interface{}, error) {
 			// Don't forget to validate the alg is what you expect:
@@ -50,7 +54,6 @@ func withUserParsing(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			fmt.Println(claims["username"], claims["id"])
 			next.ServeHTTP(w, req.WithContext(context.WithValue(req.Context(),
 				"userID", claims["id"])))
 		} else {

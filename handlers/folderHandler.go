@@ -21,6 +21,7 @@ func (fh *FolderHandler) Create(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
+	folder.UserID = req.Context().Value("userID").(string)
 	savedFolder, err := fh.folderService.Create(folder)
 	if err != nil {
 		fmt.Fprintf(w, "Its an error %s", err)

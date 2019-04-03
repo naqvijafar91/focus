@@ -1,14 +1,16 @@
 package focus
 
+import "fmt"
+
 type AggregateResponse struct {
-	data []Data
+	Data []Data `json:"data"`
 }
 
 type Data struct {
-	FolderID       string
-	Name           string
-	RemainingTasks int
-	Tasks          []*Task
+	FolderID       string  `json:"folderID"`
+	Name           string  `json:"name"`
+	RemainingTasks int     `json:"remaining_tasks"`
+	Tasks          []*Task `json:"tasks"`
 }
 
 type AggregatorService interface {
@@ -30,18 +32,27 @@ func (agtr *Aggregator) GetAllData(userID string) (*AggregateResponse, error) {
 		return nil, err
 	}
 
-	var response *AggregateResponse
+	response := &AggregateResponse{}
 	//Step2 - For every folder fetch task and create a data struct
 	for i := 0; i < len(folders); i++ {
+		fmt.Println("Filling Folder with name", folders[i].Name)
 		tasksForFolder, err := agtr.ts.GetAllByFolderID(folders[i].ID)
 		if err != nil {
 			return nil, err
 		}
-		response.data = append(response.data, Data{
+
+		if tasksForFolder == nil {
+			tasksForFolder = make([]*Task, 0)
+		}
+		response.Data = append(response.Data, Data{
 			FolderID:       folders[i].ID,
 			Name:           folders[i].Name,
 			RemainingTasks: 11,
 			Tasks:          tasksForFolder})
 	}
 	return response, nil
+}
+
+func NewAggregatorService(ts TaskService, fs FolderService, us UserService) *Aggregator {
+	return &Aggregator{ts, fs, us}
 }
