@@ -5,11 +5,11 @@ import (
 )
 
 type Task struct {
-	ID            string
-	Description   string
-	FolderID      string
-	DueDate       time.Time
-	CompletedDate time.Time
+	ID            string    `json:"id"`
+	Description   string    `json:"description"`
+	FolderID      string    `json:"folder_id"`
+	DueDate       time.Time `json:"due_date"`
+	CompletedDate time.Time `json:"completed_date"`
 }
 
 type TaskService interface {

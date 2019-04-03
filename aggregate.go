@@ -7,7 +7,7 @@ type AggregateResponse struct {
 }
 
 type Data struct {
-	FolderID       string  `json:"folderID"`
+	FolderID       string  `json:"id"`
 	Name           string  `json:"name"`
 	RemainingTasks int     `json:"remaining_tasks"`
 	Tasks          []*Task `json:"tasks"`
