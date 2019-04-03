@@ -28,7 +28,7 @@ func (th *TaskHandler) Create(w http.ResponseWriter, req *http.Request) {
 }
 
 func (th *TaskHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	tasks, err := th.taskService.GetAll()
+	tasks, err := th.taskService.GetAllByFolderID("dummyId")
 	if err != nil {
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
@@ -48,22 +48,40 @@ func (th *TaskHandler) MarkCompleted(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(completedTask)
 }
 
+func (th *TaskHandler) Update(w http.ResponseWriter, req *http.Request) {
+	var updatedTaskInReq *focus.Task
+	err := json.NewDecoder(req.Body).Decode(&updatedTaskInReq)
+	if err != nil {
+		fmt.Fprintf(w, "Its an error %s", err)
+		return
+	}
+	updatedTaskFromDB, err := th.taskService.Update(updatedTaskInReq)
+	if err != nil {
+		fmt.Fprintf(w, "Its an error %s", err)
+		return
+	}
+	json.NewEncoder(w).Encode(updatedTaskFromDB)
+}
+
 func NewTaskHandler(ts focus.TaskService) *TaskHandler {
 	return &TaskHandler{ts}
 }
 
-func (th *TaskHandler) handleTaskRoutes(w http.ResponseWriter, req *http.Request) {
-	switch req.Method {
-	case http.MethodGet:
-		th.GetAll(w, req)
-		break
-	case http.MethodPost:
-		th.Create(w, req)
-		break
-	}
-}
-
 func (th *TaskHandler) RegisterTaskRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/task", th.handleTaskRoutes)
+	middlewares := chainMiddleware(withUserParsing)
+	mux.HandleFunc("/task", middlewares(func(w http.ResponseWriter, req *http.Request) {
+		switch req.Method {
+		case http.MethodGet:
+			//@Note: This method has to be removed
+			th.GetAll(w, req)
+			break
+		case http.MethodPost:
+			th.Create(w, req)
+			break
+		case http.MethodPut:
+			th.Update(w, req)
+			break
+		}
+	}))
 	mux.HandleFunc("/task/complete", th.MarkCompleted)
 }

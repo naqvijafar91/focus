@@ -37,6 +37,7 @@ func (fh *FolderHandler) Update(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
+	// @todo: Make sure one user cannot update folder of another user
 	savedFolder, err := fh.folderService.UpdateByID(folder.ID, folder)
 	if err != nil {
 		fmt.Fprintf(w, "Its an error %s", err)
@@ -47,7 +48,7 @@ func (fh *FolderHandler) Update(w http.ResponseWriter, req *http.Request) {
 }
 
 func (fh *FolderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
-	folders, err := fh.folderService.GetAll()
+	folders, err := fh.folderService.GetAllByUserID(req.Context().Value("userID").(string))
 	if err != nil {
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
@@ -61,7 +62,8 @@ func NewFolderHandler(fs focus.FolderService) *FolderHandler {
 }
 
 func (fh *FolderHandler) RegisterFolderRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/folder", func(w http.ResponseWriter, req *http.Request) {
+	middlewares := chainMiddleware(withUserParsing)
+	mux.HandleFunc("/folder", middlewares(func(w http.ResponseWriter, req *http.Request) {
 		switch req.Method {
 		case http.MethodGet:
 			fh.GetAll(w, req)
@@ -73,5 +75,5 @@ func (fh *FolderHandler) RegisterFolderRoutes(mux *http.ServeMux) {
 			fh.Update(w, req)
 			break
 		}
-	})
+	}))
 }

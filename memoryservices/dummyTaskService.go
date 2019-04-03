@@ -12,7 +12,9 @@ type DummyTaskService struct {
 }
 
 func (dts *DummyTaskService) Create(task *focus.Task) (*focus.Task, error) {
-	newTask := &focus.Task{ID: uuid.New().String(), DueDate: task.DueDate, Description: task.Description}
+	newTask := &focus.Task{ID: uuid.New().String(), DueDate: task.DueDate,
+		Description: task.Description, FolderID: task.FolderID}
+	dts.tasks = append(dts.tasks, newTask)
 	return newTask, nil
 }
 
@@ -41,3 +43,8 @@ func (dts *DummyTaskService) MarkAsComplete(taskID string) (*focus.Task, error) 
 func (dts *DummyTaskService) GetAll() ([]*focus.Task, error) {
 	return dts.tasks, nil
 }
+
+func (dts *DummyTaskService) GetAllByFolderID(folderID string) ([]*focus.Task, error) {
+	return dts.tasks, nil
+}
+

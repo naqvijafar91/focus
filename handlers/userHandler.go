@@ -39,6 +39,7 @@ func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":       foundUser.ID,
 		"username": foundUser.Email,
 		"password": foundUser.Password,
 	})
@@ -66,6 +67,7 @@ func (handlers *Handlers) userRegistration(w http.ResponseWriter, req *http.Requ
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":       savedUser.ID,
 		"username": savedUser.Email,
 		"password": savedUser.Password,
 	})

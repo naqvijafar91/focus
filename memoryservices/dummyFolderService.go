@@ -34,3 +34,7 @@ func (dfs *DummyFolderService) UpdateByID(ID string, folder *focus.Folder) (*foc
 func (dfs *DummyFolderService) GetAll() ([]*focus.Folder, error) {
 	return dfs.folders, nil
 }
+
+func (dfs *DummyFolderService) GetAllByUserID(userID string) ([]*focus.Folder, error) {
+	return dfs.folders, nil
+}

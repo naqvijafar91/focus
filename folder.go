@@ -11,4 +11,5 @@ type FolderService interface {
 	Update(folder *Folder) (*Folder, error)
 	UpdateByID(ID string, folder *Folder) (*Folder, error)
 	GetAll() ([]*Folder, error)
+	GetAllByUserID(userID string) ([]*Folder, error)
 }
