@@ -53,27 +53,25 @@ func (fh *FolderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"folder": folders})
+		"folders": folders})
 }
 
 func NewFolderHandler(fs focus.FolderService) *FolderHandler {
 	return &FolderHandler{fs}
 }
 
-func (fh *FolderHandler) handleFolderRoute(w http.ResponseWriter, req *http.Request) {
-	switch req.Method {
-	case http.MethodGet:
-		fh.GetAll(w, req)
-		break
-	case http.MethodPost:
-		fh.Create(w, req)
-		break
-	case http.MethodPut:
-		fh.Update(w, req)
-		break
-	}
-}
-
 func (fh *FolderHandler) RegisterFolderRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/folder", fh.handleFolderRoute)
+	mux.HandleFunc("/folder", func(w http.ResponseWriter, req *http.Request) {
+		switch req.Method {
+		case http.MethodGet:
+			fh.GetAll(w, req)
+			break
+		case http.MethodPost:
+			fh.Create(w, req)
+			break
+		case http.MethodPut:
+			fh.Update(w, req)
+			break
+		}
+	})
 }
