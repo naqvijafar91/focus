@@ -56,7 +56,7 @@ class TaskList extends Component {
                     <i onClick={()=>this.toggleCalendarVisibility(taskItem.id)} className={displayDueDate?"due-date-inside-todo fa fa-calendar":'hidden'}></i>
                     <i onClick={()=>this.toggleCalendarVisibility(taskItem.id)} className={displayDueDate?'hidden':"due-date-inside-todo fa fa-calendar-o"}></i>
                     <span className="due-date-text">{formattedDueDate}</span>
-                    <span className="time-left-for-task">~30m</span>
+                    {/* <span className="time-left-for-task">~30m</span> */}
                 </div>
             </li>
         });
