@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './newLoginPage.css';
 import UserStore from './userStore';
+import axios from 'axios';
 
 class LoginPage extends Component {
 
@@ -42,26 +43,44 @@ class LoginPage extends Component {
 
     handleSubmitLogin(event) {
         event.preventDefault();
-        //@Todo:Hit api 
-        UserStore.saveUser({ user: '', 'token': '' });
-        this.props.history.push('/');
+        axios({
+            method: 'post',
+            url: 'http://localhost:8080/user/login',
+            data: {
+                email: this.state.registration_email,
+                password: this.state.registration_password
+            },
+            json: true
+        }).then(function (response) {
+            UserStore.saveUser({ 'user': response.data.user, 'token': response.data.token });
+            this.props.history.push('/');
+        });
     }
 
     handleSubmitRegister(event) {
         event.preventDefault();
-        //@Todo:Hit api 
-        UserStore.saveUser({ user: '', 'token': '' });
-        this.props.history.push('/');
+        axios({
+            method: 'post',
+            url: 'http://localhost:8080/user/register',
+            data: {
+                email: this.state.registration_email,
+                password: this.state.registration_password
+            },
+            json: true
+        }).then(function (response) {
+                UserStore.saveUser({ 'user': response.data.user, 'token': response.data.token });
+                this.props.history.push('/');
+        });
     }
 
     showRegistrationForm(event) {
         event.preventDefault();
-        this.setState({showRegistrationForm : true});
+        this.setState({ showRegistrationForm: true });
     }
 
     hideRegistrationForm(event) {
         event.preventDefault();
-        this.setState({showRegistrationForm : false});
+        this.setState({ showRegistrationForm: false });
     }
 
     render() {
@@ -77,7 +96,7 @@ class LoginPage extends Component {
                             <button>create account</button>
                             <p class="message">Already registered? <a href="#" onClick={this.hideRegistrationForm}>Sign In</a></p>
                         </form>
-                        <form className={this.state.showRegistrationForm?'hidden':"login-form"} onSubmit={this.handleSubmitLogin}>
+                        <form className={this.state.showRegistrationForm ? 'hidden' : "login-form"} onSubmit={this.handleSubmitLogin}>
                             <input type="email" placeholder="email" value={this.login_email}
                                 onChange={this.handleLoginEmailChange} />
                             <input type="password" placeholder="password" value={this.login_password}

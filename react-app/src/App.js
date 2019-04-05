@@ -7,6 +7,7 @@ import Folders from './folders/folders';
 import Tasks from './tasks/tasks';
 import Helmet from 'react-helmet';
 import UserStore from './LoginPage/userStore';
+import axios from 'axios';
 
 class App extends Component {
   constructor(props, context) {
@@ -52,6 +53,22 @@ class App extends Component {
     this.updateFolderName = this.updateFolderName.bind(this);
     this.addDummyFolderItem = this.addDummyFolderItem.bind(this);
     this.onLogout = this.onLogout.bind(this);
+    this.fetchLatestDataFromServer = this.fetchLatestDataFromServer.bind(this);
+
+    this.fetchLatestDataFromServer();
+  }
+
+  fetchLatestDataFromServer() {
+    axios({
+      method: 'get',
+      url: 'http://localhost:8080/',
+      headers:{
+        // 'Authorization' : 'Bearer '+ UserStore.getUser().token,
+        'ss':'sssss'
+      }
+  }).then(function (response) {
+      console.log(response.data);
+  });
   }
 
   handleFolderNameChange(folderID, newValue) {

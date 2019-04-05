@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/naqvijafar91/focus"
+	"github.com/rs/cors"
 
 	"github.com/naqvijafar91/focus/handlers"
 	"github.com/naqvijafar91/focus/memoryservices"
@@ -24,5 +25,7 @@ func main() {
 		userService)
 	handlers.NewAggregatorHandler(aggregatorService).RegisterAggregatorRoutes(smux)
 	fmt.Println("Server starting")
-	log.Fatal(http.ListenAndServe(":8080", smux))
+	handler := cors.New(cors.Options{
+		AllowedHeaders: []string{"Authorization"}}).Handler(smux)
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
