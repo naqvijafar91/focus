@@ -55,6 +55,8 @@ class LoginPage extends Component {
         }).then(function (response) {
             UserStore.saveUser({ 'user': response.data.user, 'token': response.data.token });
             self.props.history.push('/');
+        }).catch(function(err){
+            alert(err);
         });
     }
 
@@ -72,6 +74,8 @@ class LoginPage extends Component {
         }).then(function (response) {
                 UserStore.saveUser({ 'user': response.data.user, 'token': response.data.token });
                 self.props.history.push('/');
+        }).catch(function(err){
+            alert(err);
         });
     }
 
