@@ -43,6 +43,7 @@ class LoginPage extends Component {
 
     handleSubmitLogin(event) {
         event.preventDefault();
+        let self = this;
         axios({
             method: 'post',
             url: 'http://localhost:8080/user/login',
@@ -53,12 +54,13 @@ class LoginPage extends Component {
             json: true
         }).then(function (response) {
             UserStore.saveUser({ 'user': response.data.user, 'token': response.data.token });
-            this.props.history.push('/');
+            self.props.history.push('/');
         });
     }
 
     handleSubmitRegister(event) {
         event.preventDefault();
+        let self = this;
         axios({
             method: 'post',
             url: 'http://localhost:8080/user/register',
@@ -69,7 +71,7 @@ class LoginPage extends Component {
             json: true
         }).then(function (response) {
                 UserStore.saveUser({ 'user': response.data.user, 'token': response.data.token });
-                this.props.history.push('/');
+                self.props.history.push('/');
         });
     }
 

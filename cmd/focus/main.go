@@ -25,7 +25,9 @@ func main() {
 		userService)
 	handlers.NewAggregatorHandler(aggregatorService).RegisterAggregatorRoutes(smux)
 	fmt.Println("Server starting")
-	handler := cors.New(cors.Options{
-		AllowedHeaders: []string{"Authorization"}}).Handler(smux)
+	// handler := cors.New(cors.Options{
+	// 	AllowedOrigins: []string{"*"},
+	// 	AllowedHeaders: []string{"Authorization"}}).Handler(smux)
+	handler := cors.AllowAll().Handler(smux)
 	log.Fatal(http.ListenAndServe(":8080", handler))
 }

@@ -61,14 +61,14 @@ class App extends Component {
   fetchLatestDataFromServer() {
     axios({
       method: 'get',
-      url: 'http://localhost:8080/',
+      url: 'http://localhost:8080',
       headers:{
         // 'Authorization' : 'Bearer '+ UserStore.getUser().token,
         'ss':'sssss'
       }
   }).then(function (response) {
       console.log(response.data);
-  });
+  })
   }
 
   handleFolderNameChange(folderID, newValue) {
