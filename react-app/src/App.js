@@ -65,7 +65,7 @@ class App extends Component {
    * @returns {JSONObject} parsedResponse
    */
   parseCompleteServerResponse(response) {
-
+    return response;
   }
 
   fetchLatestDataFromServer() {
@@ -79,7 +79,7 @@ class App extends Component {
       }
     }).then(function (response) {
       console.log(response.data);
-      self.setState({data: response.data.data});
+      self.setState({data: self.parseCompleteServerResponse(response.data.data)});
     }).catch(function (err) {
       console.log(err);
       self.setState({data:[]});
@@ -148,14 +148,12 @@ class App extends Component {
   onTaskDueDateChanged(taskID, dueDate) {
 
     //@Todo : Hit the task update API
-
     // Loop through the tasks array and fetch and update task with this id
     const updatedTasksForCurrentSelectedFolder = this.state.data[this.state.currentFolderIndexSelected].tasks.map((taskItem) => {
       if (taskItem.id == taskID)
         taskItem.dueDate = dueDate;
       return taskItem;
     });
-
     console.log(updatedTasksForCurrentSelectedFolder);
     //Update our state
     const newState = Object.assign({}, this.state);
@@ -163,12 +161,39 @@ class App extends Component {
     this.setState(newState);
   }
 
-  onNewTaskAdded(taskToBeAdded, dueDate) {
+  updateTask(updatedTask) {
+    axios({
+      method:"put",
+      url : this.baseURL + "/task",
+      headers: {
+        'Authorization': 'Bearer ' + UserStore.getUser().token
+      },
+    })
+  }
+
+  onNewTaskAdded(taskToBeAdded, dueDate, folderID) {
+    let self = this;
     console.log(taskToBeAdded + ' From App.js adding newTask');
+    axios({
+      url : this.baseURL + '/task',
+      method : "post",
+      headers : {
+        'Authorization': 'Bearer ' + UserStore.getUser().token
+      },
+      data : {
+        "description" : taskToBeAdded,
+        "folder_id" : folderID,
+        // @Todo: Uncomment this once backend is good
+        // "due_date" : dueDate
+      }
+    }).then(function(response) {
     //Update our state
-    const newState = Object.assign({}, this.state);
-    newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: 100, description: taskToBeAdded, dueDate: dueDate }];
-    this.setState(newState);
+    const newState = Object.assign({}, self.state);
+    newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: response.data.id, description: taskToBeAdded, dueDate: dueDate }];
+    self.setState(newState);
+    }).catch(function(err){
+      alert(err);
+    });
   }
 
   /**
