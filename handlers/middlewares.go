@@ -36,6 +36,7 @@ func withUserParsing(next http.HandlerFunc) http.HandlerFunc {
 		//Get jwt token from headers
 		splitToken := strings.Split(req.Header.Get("Authorization"), "Bearer ")
 		if len(splitToken) < 2 {
+			w.WriteHeader(http.StatusForbidden)
 			fmt.Fprintln(w, "No token provided")
 			return
 		}
@@ -50,6 +51,7 @@ func withUserParsing(next http.HandlerFunc) http.HandlerFunc {
 			return []byte("secret"), nil
 		})
 		if err != nil {
+			w.WriteHeader(http.StatusForbidden)
 			fmt.Fprintf(w, "Its an error %s", err)
 			return
 		}
@@ -57,6 +59,7 @@ func withUserParsing(next http.HandlerFunc) http.HandlerFunc {
 			next.ServeHTTP(w, req.WithContext(context.WithValue(req.Context(),
 				"userID", claims["id"])))
 		} else {
+			w.WriteHeader(http.StatusForbidden)
 			fmt.Fprintf(w, "Unable to Parse Token")
 		}
 

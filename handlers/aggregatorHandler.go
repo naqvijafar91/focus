@@ -16,7 +16,9 @@ func (agh *AggregatorHandler) GetAllDataForUser(w http.ResponseWriter, req *http
 
 	response, err := agh.agservice.GetAllData(req.Context().Value("userID").(string))
 	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "Failed to get details %s", err)
+		return
 	}
 	json.NewEncoder(w).Encode(response)
 }

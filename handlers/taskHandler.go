@@ -16,11 +16,13 @@ func (th *TaskHandler) Create(w http.ResponseWriter, req *http.Request) {
 	var newTask *focus.Task
 	err := json.NewDecoder(req.Body).Decode(&newTask)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Failed to parse request %s", err)
 		return
 	}
 	createdTask, err := th.taskService.Create(newTask)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Failed to save task %s", err)
 		return
 	}
@@ -30,6 +32,7 @@ func (th *TaskHandler) Create(w http.ResponseWriter, req *http.Request) {
 func (th *TaskHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	tasks, err := th.taskService.GetAllByFolderID("dummyId")
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
@@ -42,6 +45,7 @@ func (th *TaskHandler) MarkCompleted(w http.ResponseWriter, req *http.Request) {
 	taskID := req.Form["taskID"][0]
 	completedTask, err := th.taskService.MarkAsComplete(taskID)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
@@ -52,11 +56,13 @@ func (th *TaskHandler) Update(w http.ResponseWriter, req *http.Request) {
 	var updatedTaskInReq *focus.Task
 	err := json.NewDecoder(req.Body).Decode(&updatedTaskInReq)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
 	updatedTaskFromDB, err := th.taskService.Update(updatedTaskInReq)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}

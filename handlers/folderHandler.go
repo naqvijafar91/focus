@@ -18,12 +18,14 @@ func (fh *FolderHandler) Create(w http.ResponseWriter, req *http.Request) {
 	var folder *focus.Folder
 	err := decoder.Decode(&folder)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
 	folder.UserID = req.Context().Value("userID").(string)
 	savedFolder, err := fh.folderService.Create(folder)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
@@ -35,12 +37,14 @@ func (fh *FolderHandler) Update(w http.ResponseWriter, req *http.Request) {
 	var folder *focus.Folder
 	err := decoder.Decode(&folder)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
 	// @todo: Make sure one user cannot update folder of another user
 	savedFolder, err := fh.folderService.UpdateByID(folder.ID, folder)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
@@ -51,6 +55,7 @@ func (fh *FolderHandler) Update(w http.ResponseWriter, req *http.Request) {
 func (fh *FolderHandler) GetAll(w http.ResponseWriter, req *http.Request) {
 	folders, err := fh.folderService.GetAllByUserID(req.Context().Value("userID").(string))
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}

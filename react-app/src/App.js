@@ -63,11 +63,13 @@ class App extends Component {
       method: 'get',
       url: 'http://localhost:8080',
       headers:{
-        // 'Authorization' : 'Bearer '+ UserStore.getUser().token,
+        'Authorization' : 'Bearer '+ UserStore.getUser().token,
         'ss':'sssss'
       }
   }).then(function (response) {
       console.log(response.data);
+  }).catch(function(err){
+      console.log(err);
   })
   }
 
