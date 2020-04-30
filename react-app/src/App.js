@@ -79,10 +79,10 @@ class App extends Component {
       }
     }).then(function (response) {
       console.log(response.data);
-      // self.setState({data: response.data});
+      self.setState({data: response.data.data});
     }).catch(function (err) {
       console.log(err);
-      // self.setState({data:[]});
+      self.setState({data:[]});
       alert(err);
     })
   }
@@ -113,7 +113,7 @@ class App extends Component {
       headers: {
         'Authorization': 'Bearer ' + UserStore.getUser().token
       },
-      body: updatedFolder
+      data: updatedFolder
     }).then(function(resp){
       console.log('Folder updated');
     }).catch(function(err){
@@ -182,7 +182,7 @@ class App extends Component {
       headers: {
         'Authorization': 'Bearer ' + UserStore.getUser().token
       },
-      body: {
+      data: {
         "name": "New Folder"
       }
     }).then(function (response) {
@@ -191,7 +191,7 @@ class App extends Component {
       // @Todo : We will get the id from backend
       // console.log(new);
       newState.data.push({
-        id: 100,
+        id: response.id,
         name: 'New Folder',
         remaining_tasks: 0,
         tasks: []
