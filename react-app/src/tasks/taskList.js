@@ -49,7 +49,7 @@ class TaskList extends Component {
                 <div>
                     <input type="checkbox" name={taskItem.id}
                         onChange={this.handleTaskCompleted} />
-                    <div className="todos">{taskItem.task}</div>
+                    <div className="todos">{taskItem.description}</div>
                     <Calendar className={this.state.showCalendarWithTaskID == taskItem.id ?'add-task-calendar':'hidden'}
                      onChange={(updatedDate)=>this.onDueDateChanged(taskItem.id,updatedDate)}
                         value={date==''?new Date():date}/>

@@ -1,6 +1,8 @@
 package memoryservices
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/naqvijafar91/focus"
 )
@@ -20,10 +22,10 @@ func (dfs *DummyFolderService) Update(folder *focus.Folder) (*focus.Folder, erro
 		folderInStore := dfs.folders[i]
 		if folder.ID == folderInStore.ID {
 			dfs.folders[i] = folder
-			return folder, nil
+			return dfs.folders[i], nil
 		}
 	}
-	return folder, nil
+	return nil, errors.New("Folder not found")
 }
 
 func (dfs *DummyFolderService) UpdateByID(ID string, folder *focus.Folder) (*focus.Folder, error) {
