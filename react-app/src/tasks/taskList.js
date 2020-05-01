@@ -42,23 +42,33 @@ class TaskList extends Component {
     
     render() {
         var listItems = this.props.tasks.map((taskItem) => {
-            const displayDueDate = !taskItem.dueDate || taskItem.dueDate == '' ? false : true; 
-            const date = taskItem.dueDate;
-            const formattedDueDate = displayDueDate ? taskItem.dueDate.toDateString() : '';
+            const displayDueDate = !taskItem.due_date || taskItem.due_date == '' ? false : true; 
+            const date = taskItem.due_date;
+            const formattedDueDate = displayDueDate ? taskItem.due_date.toDateString() : '';
+            // Do not display anything if completed date is before current date
+            if(taskItem.completed_date < new Date()) {
+                console.log("This task has been completed "+ JSON.stringify(taskItem));
+                return;
+            }
             return <li key={taskItem.id}>
                 <div>
                     <input type="checkbox" name={taskItem.id}
                         onChange={this.handleTaskCompleted} />
-                    <div className="todos">{taskItem.task}</div>
+                    <div className="todos">{taskItem.description}</div>
                     <Calendar className={this.state.showCalendarWithTaskID == taskItem.id ?'add-task-calendar':'hidden'}
                      onChange={(updatedDate)=>this.onDueDateChanged(taskItem.id,updatedDate)}
                         value={date==''?new Date():date}/>
                     <i onClick={()=>this.toggleCalendarVisibility(taskItem.id)} className={displayDueDate?"due-date-inside-todo fa fa-calendar":'hidden'}></i>
                     <i onClick={()=>this.toggleCalendarVisibility(taskItem.id)} className={displayDueDate?'hidden':"due-date-inside-todo fa fa-calendar-o"}></i>
                     <span className="due-date-text">{formattedDueDate}</span>
-                    <span className="time-left-for-task">~30m</span>
+                    {/* <span className="time-left-for-task">~30m</span> */}
                 </div>
             </li>
+        }).filter((taskItem)=>{
+            if(!taskItem) {
+                return false;
+            }
+            return true;
         });
 
         return (

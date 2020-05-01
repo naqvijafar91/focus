@@ -1,9 +1,9 @@
 package focus
 
 type Folder struct {
-	ID     string
-	Name   string
-	UserID string
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	UserID string `json:"user_id"`
 }
 
 type FolderService interface {
@@ -11,4 +11,5 @@ type FolderService interface {
 	Update(folder *Folder) (*Folder, error)
 	UpdateByID(ID string, folder *Folder) (*Folder, error)
 	GetAll() ([]*Folder, error)
+	GetAllByUserID(userID string) ([]*Folder, error)
 }

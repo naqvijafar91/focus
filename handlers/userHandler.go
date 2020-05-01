@@ -24,26 +24,31 @@ func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
 	var userLoginReq *focus.User
 	err := decoder.Decode(&userLoginReq)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
 	foundUser, err := handlers.userService.FindUserByEmail(userLoginReq.Email)
 	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
 
 	if foundUser.Password != userLoginReq.Password {
+		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "Its an error %s", errors.New("Invalid password"))
 		return
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":       foundUser.ID,
 		"username": foundUser.Email,
 		"password": foundUser.Password,
 	})
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintln(w, error)
 	}
 	json.NewEncoder(w).Encode(map[string]interface{}{
@@ -56,21 +61,25 @@ func (handlers *Handlers) userRegistration(w http.ResponseWriter, req *http.Requ
 	var user *focus.User
 	err := decoder.Decode(&user)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
 	savedUser, err := handlers.userService.Create(user)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":       savedUser.ID,
 		"username": savedUser.Email,
 		"password": savedUser.Password,
 	})
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Println(error)
 	}
 	json.NewEncoder(w).Encode(map[string]interface{}{

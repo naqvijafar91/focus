@@ -1,6 +1,8 @@
-package memoryservices
+package memorybackedservices
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/naqvijafar91/focus"
 )
@@ -16,12 +18,14 @@ func (dfs *DummyFolderService) Create(folder *focus.Folder) (*focus.Folder, erro
 }
 
 func (dfs *DummyFolderService) Update(folder *focus.Folder) (*focus.Folder, error) {
-	for _, folderInStore := range dfs.folders {
+	for i := 0; i < len(dfs.folders); i++ {
+		folderInStore := dfs.folders[i]
 		if folder.ID == folderInStore.ID {
-			folderInStore = folder
+			dfs.folders[i] = folder
+			return dfs.folders[i], nil
 		}
 	}
-	return folder, nil
+	return nil, errors.New("Folder not found")
 }
 
 func (dfs *DummyFolderService) UpdateByID(ID string, folder *focus.Folder) (*focus.Folder, error) {
@@ -30,5 +34,9 @@ func (dfs *DummyFolderService) UpdateByID(ID string, folder *focus.Folder) (*foc
 }
 
 func (dfs *DummyFolderService) GetAll() ([]*focus.Folder, error) {
+	return dfs.folders, nil
+}
+
+func (dfs *DummyFolderService) GetAllByUserID(userID string) ([]*focus.Folder, error) {
 	return dfs.folders, nil
 }
