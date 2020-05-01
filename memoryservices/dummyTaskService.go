@@ -1,6 +1,7 @@
 package memoryservices
 
 import (
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -25,7 +26,7 @@ func (dts *DummyTaskService) Update(task *focus.Task) (*focus.Task, error) {
 			return dts.tasks[i], nil
 		}
 	}
-	return task, nil
+	return nil, errors.New("Task Not Found")
 }
 
 func (dts *DummyTaskService) MarkAsComplete(taskID string) (*focus.Task, error) {

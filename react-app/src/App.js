@@ -15,37 +15,35 @@ class App extends Component {
     super(props, context);
     this.baseURL = ServerURLFetcher.getURL();
     this.state = {
-      data: [
-        {
-          id: 1,
-          name: 'Inbox',
-          remaining_tasks: 13,
-          tasks: [{ id: 1, description: 'Task 1 to be done', dueDate: '' },
-          { id: 2, description: 'Task 2', dueDate: new Date() },
-          { id: 3, description: 'Task 3', dueDate: new Date() },
-          { id: 4, description: 'Task 4', dueDate: '' }]
-        },
-        {
-
-          id: 2,
-          name: 'Grocery',
-          remaining_tasks: 1234,
-          tasks: [{ id: 5, description: 'Task 1 to be done g' },
-          { id: 6, description: 'Task 2 g' }, { id: 7, description: 'Task 3 g' },
-          { id: 8, description: 'Task 4 g' }]
-        },
-        {
-          id: 3,
-          name: 'Work',
-          remaining_tasks: 2,
-          tasks: [{ id: 9, description: 'Task 1 to be done w' },
-          { id: 10, description: 'Task 2 w' }, { id: 11, description: 'Task 3 w' },
-          { id: 12, description: 'Task 4 w' }]
-        }
-      ],
+      data: [],
       currentFolderIndexSelected: 0
     };
+    // {
+    //   id: 1,
+    //   name: 'Inbox',
+    //   remaining_tasks: 13,
+    //   tasks: [{ id: 1, description: 'Task 1 to be done', dueDate: '' },
+    //   { id: 2, description: 'Task 2', dueDate: new Date() },
+    //   { id: 3, description: 'Task 3', dueDate: new Date() },
+    //   { id: 4, description: 'Task 4', dueDate: '' }]
+    // },
+    // {
 
+    //   id: 2,
+    //   name: 'Grocery',
+    //   remaining_tasks: 1234,
+    //   tasks: [{ id: 5, description: 'Task 1 to be done g' },
+    //   { id: 6, description: 'Task 2 g' }, { id: 7, description: 'Task 3 g' },
+    //   { id: 8, description: 'Task 4 g' }]
+    // },
+    // {
+    //   id: 3,
+    //   name: 'Work',
+    //   remaining_tasks: 2,
+    //   tasks: [{ id: 9, description: 'Task 1 to be done w' },
+    //   { id: 10, description: 'Task 2 w' }, { id: 11, description: 'Task 3 w' },
+    //   { id: 12, description: 'Task 4 w' }]
+    // }
     this.onTaskCompleted = this.onTaskCompleted.bind(this);
     this.onTaskDueDateChanged = this.onTaskDueDateChanged.bind(this);
     this.onNewTaskAdded = this.onNewTaskAdded.bind(this);
@@ -56,6 +54,7 @@ class App extends Component {
     this.onLogout = this.onLogout.bind(this);
     this.fetchLatestDataFromServer = this.fetchLatestDataFromServer.bind(this);
     this.parseCompleteServerResponse = this.parseCompleteServerResponse.bind(this);
+    this.updateTask = this.updateTask.bind(this);
     this.fetchLatestDataFromServer();
   }
 
@@ -79,10 +78,10 @@ class App extends Component {
       }
     }).then(function (response) {
       console.log(response.data);
-      self.setState({data: self.parseCompleteServerResponse(response.data.data)});
+      self.setState({ data: self.parseCompleteServerResponse(response.data.data) });
     }).catch(function (err) {
       console.log(err);
-      self.setState({data:[]});
+      self.setState({ data: [] });
       alert(err);
     })
   }
@@ -104,19 +103,19 @@ class App extends Component {
     for (var i = 0; i < this.state.data.length; i++) {
       const folder = this.state.data[i];
       if (folder.id == folderID) {
-          updatedFolder = folder;
+        updatedFolder = folder;
       }
     }
-    axios ({
+    axios({
       method: 'put',
       url: this.baseURL + '/folder',
       headers: {
         'Authorization': 'Bearer ' + UserStore.getUser().token
       },
       data: updatedFolder
-    }).then(function(resp){
+    }).then(function (resp) {
       console.log('Folder updated');
-    }).catch(function(err){
+    }).catch(function (err) {
       alert(err);
     });
   }
@@ -132,66 +131,89 @@ class App extends Component {
   }
 
   onTaskCompleted(taskID) {
+    let taskToBeUpdated = null;
+    let self = this;
     // Loop through the tasks array and fremove task with this id
     const updatedTasksForCurrentSelectedFolder = this.state.data[this.state.currentFolderIndexSelected].tasks.filter((taskItem) => {
-      if (taskItem.id == taskID)
+      if (taskItem.id == taskID) {
+        taskToBeUpdated = taskItem;
         return false;
+      }
       return true;
     });
 
-    //Update our state
-    const newState = Object.assign({}, this.state);
-    newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
-    this.setState(newState);
+    this.updateTask(taskToBeUpdated)
+      .then(function (done) {
+        //Update our state
+        const newState = Object.assign({}, self.state);
+        newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
+        self.setState(newState);
+      }).catch(function (err) {
+        alert(err);
+      });
   }
 
   onTaskDueDateChanged(taskID, dueDate) {
 
-    //@Todo : Hit the task update API
+    let taskToBeUpdated = null;
+    let self = this;
     // Loop through the tasks array and fetch and update task with this id
+    // Also fetch the task object for hitting the API
     const updatedTasksForCurrentSelectedFolder = this.state.data[this.state.currentFolderIndexSelected].tasks.map((taskItem) => {
-      if (taskItem.id == taskID)
+      if (taskItem.id == taskID) {
         taskItem.dueDate = dueDate;
+        taskToBeUpdated = taskItem;
+      }
       return taskItem;
     });
     console.log(updatedTasksForCurrentSelectedFolder);
-    //Update our state
-    const newState = Object.assign({}, this.state);
-    newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
-    this.setState(newState);
+    this.updateTask(taskToBeUpdated)
+      .then(function (done) {
+        //Update our state
+        const newState = Object.assign({}, self.state);
+        newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
+        self.setState(newState);
+      }).catch(function (error) {
+        alert(error);
+      });
   }
 
+  /**
+   * Updates a task object on the server
+   * @param {Task} updatedTask 
+   */
   updateTask(updatedTask) {
-    axios({
-      method:"put",
-      url : this.baseURL + "/task",
+    return axios({
+      method: "put",
+      url: this.baseURL + "/task",
       headers: {
         'Authorization': 'Bearer ' + UserStore.getUser().token
       },
-    })
+      data: updatedTask
+    });
   }
 
   onNewTaskAdded(taskToBeAdded, dueDate, folderID) {
     let self = this;
     console.log(taskToBeAdded + ' From App.js adding newTask');
     axios({
-      url : this.baseURL + '/task',
-      method : "post",
-      headers : {
+      url: this.baseURL + '/task',
+      method: "post",
+      headers: {
         'Authorization': 'Bearer ' + UserStore.getUser().token
       },
-      data : {
-        "description" : taskToBeAdded,
-        "folder_id" : folderID,
+      data: {
+        "description": taskToBeAdded,
+        "folder_id": folderID,
         // @Todo: Uncomment this once backend is good
         // "due_date" : dueDate
       }
-    }).then(function(response) {
-    //Update our state
-    const newState = Object.assign({}, self.state);
-    newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: response.data.id, description: taskToBeAdded, dueDate: dueDate }];
-    self.setState(newState);
-    }).catch(function(err){
+    }).then(function (response) {
+      //Update our state
+      const newState = Object.assign({}, self.state);
+      newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: response.data.id, description: taskToBeAdded, dueDate: dueDate }];
+      self.setState(newState);
+    }).catch(function (err) {
       alert(err);
     });
   }
@@ -201,6 +223,7 @@ class App extends Component {
    * @Todo : Perform API hit to create a dummy folder named New Folder
    */
   addDummyFolderItem(notifyChildComponentWithNewID) {
+    let self = this;
     axios({
       method: 'post',
       url: this.baseURL + '/folder',
@@ -211,21 +234,19 @@ class App extends Component {
         "name": "New Folder"
       }
     }).then(function (response) {
-      const newState = Object.assign({}, this.state);
-      // newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: 100, task: taskToBeAdded }];
-      // @Todo : We will get the id from backend
-      // console.log(new);
+      console.log(response);
+      const newState = Object.assign({}, self.state);
       newState.data.push({
-        id: response.id,
+        id: response.data.id,
         name: 'New Folder',
         remaining_tasks: 0,
         tasks: []
       });
-      this.setState(newState, function () {
-        notifyChildComponentWithNewID(response.id);
+      self.setState(newState, function () {
+        notifyChildComponentWithNewID(response.data.id);
       });
     }).catch(function (err) {
-       alert(err);
+      alert(err);
     });
 
   }
@@ -236,8 +257,13 @@ class App extends Component {
   }
 
   render() {
-    const currentSelectedFolderTasks = this.state.data[this.state.currentFolderIndexSelected].tasks;
-    const currentSelectedFolderID = this.state.data[this.state.currentFolderIndexSelected].id;
+    const currentSelectedFolderObject = this.state.data[this.state.currentFolderIndexSelected];
+    let currentSelectedFolderTasks = [];
+    let currentSelectedFolderID = "";
+    if (currentSelectedFolderObject) {
+      currentSelectedFolderTasks = currentSelectedFolderObject.tasks;
+      currentSelectedFolderID = currentSelectedFolderObject.id;
+    }
     return (
       <div id="app-container">
         <Helmet>
