@@ -9,14 +9,14 @@ import (
 	"github.com/rs/cors"
 
 	"github.com/naqvijafar91/focus/handlers"
-	"github.com/naqvijafar91/focus/memoryservices"
+	"github.com/naqvijafar91/focus/memorybackedservices"
 )
 
 func main() {
 	smux := http.NewServeMux()
-	folderService := &memoryservices.DummyFolderService{}
-	userService := &memoryservices.DummyUserService{}
-	taskService := &memoryservices.DummyTaskService{}
+	folderService := &memorybackedservices.DummyFolderService{}
+	userService := &memorybackedservices.DummyUserService{}
+	taskService := &memorybackedservices.DummyTaskService{}
 	handlers.NewFolderHandler(folderService).RegisterFolderRoutes(smux)
 	handlers.NewHandler(userService).RegisterUserRoutes(smux)
 	handlers.NewTaskHandler(taskService).RegisterTaskRoutes(smux)

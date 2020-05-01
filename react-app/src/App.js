@@ -92,17 +92,22 @@ class App extends Component {
    * @param {Date} dateObj 
    */
   extractDateString(dateObj) {
-    let day = dateObj.getDate();
-    if(day<10) {
-      day = "0"+day;
+    try {
+      let day = dateObj.getDate();
+      if(day<10) {
+        day = "0"+day;
+      }
+      let month = dateObj.getMonth()+1;
+      if(month<10) {
+        month = "0"+month;
+      }
+      const year = dateObj.getFullYear();
+      const dateStr = day+"-"+month+"-"+year;
+      return dateStr;
+    } catch(err) {
+      return null;
     }
-    let month = dateObj.getMonth()+1;
-    if(month<10) {
-      month = "0"+month;
-    }
-    const year = dateObj.getFullYear();
-    const dateStr = day+"-"+month+"-"+year;
-    return dateStr;
+    return null;
   }
 
   fetchLatestDataFromServer() {
@@ -174,6 +179,7 @@ class App extends Component {
     // Loop through the tasks array and fremove task with this id
     const updatedTasksForCurrentSelectedFolder = this.state.data[this.state.currentFolderIndexSelected].tasks.filter((taskItem) => {
       if (taskItem.id == taskID) {
+        taskItem.completed_date = new Date();
         taskToBeUpdated = taskItem;
         return false;
       }
@@ -254,7 +260,7 @@ class App extends Component {
         "description": taskToBeAdded,
         "folder_id": folderID,
         // @Todo: Uncomment this once backend is good
-        // "due_date" : dueDate
+        "due_date" : self.extractDateString(dueDate)
       }
     }).then(function (response) {
       //Update our state

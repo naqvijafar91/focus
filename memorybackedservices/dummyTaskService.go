@@ -1,4 +1,4 @@
-package memoryservices
+package memorybackedservices
 
 import (
 	"errors"
