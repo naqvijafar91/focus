@@ -56,6 +56,7 @@ class App extends Component {
     this.parseCompleteServerResponse = this.parseCompleteServerResponse.bind(this);
     this.updateTask = this.updateTask.bind(this);
     this.parseDate = this.parseDate.bind(this);
+    this.extractDateString = this.extractDateString.bind(this);
     this.fetchLatestDataFromServer();
   }
 
@@ -84,6 +85,24 @@ class App extends Component {
     return new Date(parseInt(parts[2], 10),
       parseInt(parts[1], 10) - 1,
       parseInt(parts[0], 10));
+  }
+
+  /**
+   * Converts date object to its string representation
+   * @param {Date} dateObj 
+   */
+  extractDateString(dateObj) {
+    let day = dateObj.getDate();
+    if(day<10) {
+      day = "0"+day;
+    }
+    let month = dateObj.getMonth()+1;
+    if(month<10) {
+      month = "0"+month;
+    }
+    const year = dateObj.getFullYear();
+    const dateStr = day+"-"+month+"-"+year;
+    return dateStr;
   }
 
   fetchLatestDataFromServer() {
@@ -198,17 +217,27 @@ class App extends Component {
   }
 
   /**
-   * Updates a task object on the server
+   * Updates a task object on the server, this function also parses the date strings into correct string format
+   * representations
    * @param {Task} updatedTask 
    */
   updateTask(updatedTask) {
+    // First modify 
+    let clonedTask = {
+      id : updatedTask.id,
+      description : updatedTask.description,
+      folder_id: updatedTask.folder_id,
+      due_date : this.extractDateString(updatedTask.due_date),
+      completed_date: this.extractDateString(updatedTask.completed_date)
+    };
+
     return axios({
       method: "put",
       url: this.baseURL + "/task",
       headers: {
         'Authorization': 'Bearer ' + UserStore.getUser().token
       },
-      data: updatedTask
+      data: clonedTask
     });
   }
 

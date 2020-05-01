@@ -10,7 +10,7 @@ it('renders without crashing', () => {
   ReactDOM.unmountComponentAtNode(div);
 });
 
-it('should parse server response',()=>{
+it('should to and fro between dates',()=>{
   let resp = {
     "data": [
       {
@@ -35,5 +35,6 @@ it('should parse server response',()=>{
   expect(parsedDate.getMonth()).toBe(4);
   expect(parsedDate.getDate()).toBe(1);
   expect(parsedDate.getFullYear()).toBe(2020);
-
+  const dateConvertedToString = testApp.extractDateString(parsedDate);
+  expect(dateConvertedToString).toBe("01-05-2020");
 });
