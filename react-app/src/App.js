@@ -55,6 +55,7 @@ class App extends Component {
     this.fetchLatestDataFromServer = this.fetchLatestDataFromServer.bind(this);
     this.parseCompleteServerResponse = this.parseCompleteServerResponse.bind(this);
     this.updateTask = this.updateTask.bind(this);
+    this.parseDate = this.parseDate.bind(this);
     this.fetchLatestDataFromServer();
   }
 
@@ -64,7 +65,25 @@ class App extends Component {
    * @returns {JSONObject} parsedResponse
    */
   parseCompleteServerResponse(response) {
+    let self = this;
+    let folders = response.data;
+    for (let i = 0; i < folders.length; i++) {
+      let folder = folders[i];
+      for (let j = 0; j < folder.tasks.length; j++) {
+        let task = folder.tasks[j];
+        // parse due_date and completed_date
+        task.due_date = self.parseDate(task.due_date);
+        task.completed_date = self.parseDate(task.completed_date);
+      }
+    }
     return response;
+  }
+
+  parseDate(dateString) {
+    let parts = dateString.split("-");
+    return new Date(parseInt(parts[2], 10),
+      parseInt(parts[1], 10) - 1,
+      parseInt(parts[0], 10));
   }
 
   fetchLatestDataFromServer() {
@@ -78,7 +97,7 @@ class App extends Component {
       }
     }).then(function (response) {
       console.log(response.data);
-      self.setState({ data: self.parseCompleteServerResponse(response.data.data) });
+      self.setState({ data: self.parseCompleteServerResponse(response.data).data });
     }).catch(function (err) {
       console.log(err);
       self.setState({ data: [] });
