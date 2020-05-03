@@ -33,7 +33,7 @@ func (dts *DummyTaskService) MarkAsComplete(taskID string) (*focus.Task, error) 
 	var foundTask *focus.Task
 	for i := 0; i < len(dts.tasks); i++ {
 		if taskID == dts.tasks[i].ID {
-			dts.tasks[i].CompletedDate = time.Now()
+			dts.tasks[i].CompletedDate = &focus.Time{time.Now()}
 			foundTask = dts.tasks[i]
 			return foundTask, nil
 		}
@@ -48,4 +48,3 @@ func (dts *DummyTaskService) GetAll() ([]*focus.Task, error) {
 func (dts *DummyTaskService) GetAllByFolderID(folderID string) ([]*focus.Task, error) {
 	return dts.tasks, nil
 }
-

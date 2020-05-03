@@ -65,7 +65,7 @@ func (ts *TaskService) MarkAsComplete(taskID string) (*focus.Task, error) {
 	if err != nil {
 		return nil, err
 	}
-	taskUpdated.CompletedDate = time.Now()
+	taskUpdated.CompletedDate = &focus.Time{time.Now()}
 	err = ts.db.Save(taskUpdated).Error
 	if err != nil {
 		return nil, err
