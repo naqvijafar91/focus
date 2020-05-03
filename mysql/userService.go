@@ -14,7 +14,7 @@ type UserService struct {
 	db *gorm.DB
 }
 
-func NewUserService(host string, port int, username string, dbName string, password string) (*UserService, error) {
+func NewMysqlConn(host string, port int, username string, dbName string, password string) (*gorm.DB, error) {
 	// user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
 	sqlInfo := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
 		username, password, host, port, dbName)
@@ -22,10 +22,10 @@ func NewUserService(host string, port int, username string, dbName string, passw
 	if err != nil {
 		return nil, err
 	}
-	return NewUserServiceWithConnection(db)
+	return db, nil
 }
 
-func NewUserServiceWithConnection(db *gorm.DB) (*UserService, error) {
+func NewUserService(db *gorm.DB) (*UserService, error) {
 	// Migrate the schema
 	err := db.AutoMigrate(&focus.User{}).Error
 	if err != nil {
@@ -44,7 +44,6 @@ func (us *UserService) Create(user *focus.User) (*focus.User, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return user, nil
 }
 

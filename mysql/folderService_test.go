@@ -1,0 +1,127 @@
+package mysql
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/naqvijafar91/focus"
+)
+
+func createFolderService(t *testing.T) *FolderService {
+	db, err := createConnection()
+	if err != nil {
+		t.Error(err)
+		return nil
+	}
+	usr, err := NewFolderService(db)
+	if err != nil {
+		t.Error(err)
+		return nil
+	}
+	return usr
+}
+
+func createUser(t *testing.T, email string) *focus.User {
+	usr := createUserService(t)
+	if usr == nil {
+		return nil
+	}
+	user, err := usr.Create(&focus.User{Email: email, Password: "xxx"})
+	if err != nil {
+		t.Error("Should not throw error")
+		return nil
+	}
+	return user
+}
+
+func createFolder(name string, user *focus.User, fs *FolderService) error {
+	_, err := fs.Create(&focus.Folder{Name: name, UserID: user.ID})
+	return err
+}
+
+func TestFolderCreate(t *testing.T) {
+	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
+	if fs == nil || user == nil {
+		return
+	}
+	folder, err := fs.Create(&focus.Folder{Name: "ola", UserID: user.ID})
+	if err != nil {
+		t.Error("Folder is nil")
+		return
+	}
+	if folder.Name != "ola" && folder.UserID != user.ID {
+		t.Error("Wrong user ID and name")
+	}
+}
+
+func TestUpdateFolder(t *testing.T) {
+	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
+	if fs == nil || user == nil {
+		return
+	}
+	folder, _ := fs.Create(&focus.Folder{Name: "ola", UserID: user.ID})
+	folder.Name = "updated Name"
+	updated, err := fs.Update(folder)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if updated.Name != "updated Name" {
+		t.Error("Name not updated")
+	}
+}
+
+func TestGetAll(t *testing.T) {
+	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
+	if fs == nil || user == nil {
+		return
+	}
+	// Create 10 folders
+	for i := 0; i < 10; i++ {
+		err := createFolder(fmt.Sprintf("name-%d", i), user, fs)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+	}
+	folders, err := fs.GetAll()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if len(folders) != 10 {
+		t.Error("Less folders found")
+	}
+}
+
+func TestGetAllByID(t *testing.T) {
+	fs, user1, user2 := createFolderService(t), createUser(t,"xyz@ss.com"), createUser(t,"xya@ss.com")
+	if fs == nil || user1 == nil || user2 == nil {
+		return
+	}
+	// Create 10 folders for user 1 and user 2 respectively
+	for i := 0; i < 10; i++ {
+		err := createFolder(fmt.Sprintf("name-%d", i), user1, fs)
+		err = createFolder(fmt.Sprintf("name-%d", i), user2, fs)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+	}
+	folders1, err1 := fs.GetAllByUserID(user1.ID)
+	folders2, err2 := fs.GetAllByUserID(user2.ID)
+	if err1 != nil || err2 != nil {
+		t.Error(err1, err2)
+		return
+	}
+	if len(folders1) != 10 || len(folders2) != 10 {
+		t.Error("Less folders found")
+		return
+	}
+	for i := 0; i < 10; i++ {
+		name := fmt.Sprintf("name-%d", i)
+		if folders1[i].Name != name || folders2[i].Name != name {
+			t.Error("Name not matching at index", i)
+		}
+	}
+}

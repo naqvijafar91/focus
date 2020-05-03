@@ -8,13 +8,21 @@ import (
 	"github.com/naqvijafar91/focus"
 )
 
-func createService(t *testing.T) *UserService {
+func createConnection() (*gorm.DB, error) {
 	db, err := gorm.Open("sqlite3", ":memory:")
 	if err != nil {
-		t.Error("Failed to init service for testing")
+		return nil, err
+	}
+	return db, nil
+}
+
+func createUserService(t *testing.T) *UserService {
+	db, err := createConnection()
+	if err != nil {
+		t.Error(err)
 		return nil
 	}
-	usr, err := NewUserServiceWithConnection(db)
+	usr, err := NewUserService(db)
 	if err != nil {
 		t.Error(err)
 		return nil
@@ -22,7 +30,7 @@ func createService(t *testing.T) *UserService {
 	return usr
 }
 func TestCreate(t *testing.T) {
-	usr := createService(t)
+	usr := createUserService(t)
 	if usr == nil {
 		return
 	}
@@ -33,7 +41,7 @@ func TestCreate(t *testing.T) {
 }
 
 func TestFindUserByEmail(t *testing.T) {
-	usr := createService(t)
+	usr := createUserService(t)
 	if usr == nil {
 		return
 	}
@@ -49,7 +57,7 @@ func TestFindUserByEmail(t *testing.T) {
 }
 
 func TestNoDuplicateEmail(t *testing.T) {
-	usr := createService(t)
+	usr := createUserService(t)
 	if usr == nil {
 		return
 	}
