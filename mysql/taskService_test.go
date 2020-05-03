@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jinzhu/gorm"
@@ -107,5 +108,99 @@ func TestTaskShouldNotCreateWithWrongFolderID(t *testing.T) {
 	}
 	if tsk != nil {
 		t.Error("Task should not be created")
+	}
+}
+
+func TestUpdateTask(t *testing.T) {
+	conn, err := createConnection()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	ts, fs, user := createTaskServiceWithConn(t, conn), createFolderServiceWithConn(t, conn), createUserWithConn(t, "dummy@xyz.com", conn)
+	if ts == nil || fs == nil || user == nil {
+		return
+	}
+	folder, _ := fs.Create(&focus.Folder{Name: "ola", UserID: user.ID})
+	tsk, _ := ts.Create(&focus.Task{Description: "Dummy Task", FolderID: folder.ID})
+	tsk.Description = "Updated Task"
+	updated, err := ts.Update(tsk)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if updated == nil {
+		t.Error("Returned nil")
+		return
+	}
+	if updated.Description != "Updated Task" {
+		t.Error("Task not updated")
+	}
+}
+
+func TestTaskGetAll(t *testing.T) {
+	conn, err := createConnection()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	ts, fs, user := createTaskServiceWithConn(t, conn), createFolderServiceWithConn(t, conn), createUserWithConn(t, "dummy@xyz.com", conn)
+	if ts == nil || fs == nil || user == nil {
+		return
+	}
+	folder, _ := fs.Create(&focus.Folder{Name: "ola", UserID: user.ID})
+	for i := 0; i < 10; i++ {
+		_, err := ts.Create(&focus.Task{Description: "Dummy Task", FolderID: folder.ID})
+		if err != nil {
+			t.Error("Should not throw error")
+			return
+		}
+	}
+	tasks, err := ts.GetAll()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if len(tasks) != 10 {
+		t.Error("Less tasks found")
+	}
+}
+
+func TestTaskGetAllByFolderID(t *testing.T) {
+	conn, err := createConnection()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	ts, fs, user := createTaskServiceWithConn(t, conn), createFolderServiceWithConn(t, conn), createUserWithConn(t, "dummy@xyz.com", conn)
+	if ts == nil || fs == nil || user == nil {
+		return
+	}
+	folder, _ := fs.Create(&focus.Folder{Name: "ola", UserID: user.ID})
+	folder2, _ := fs.Create(&focus.Folder{Name: "ola 2", UserID: user.ID})
+	for i := 0; i < 10; i++ {
+		desc := fmt.Sprintf("desc-%d", i)
+		_, err := ts.Create(&focus.Task{Description: desc, FolderID: folder.ID})
+		_, err = ts.Create(&focus.Task{Description: desc, FolderID: folder2.ID})
+		if err != nil {
+			t.Error("Should not throw error")
+			return
+		}
+	}
+	tasks1, err1 := ts.GetAllByFolderID(folder.ID)
+	tasks2, err2 := ts.GetAllByFolderID(folder2.ID)
+	if err1 != nil || err2 != nil {
+		t.Error(err1, err2)
+		return
+	}
+	if len(tasks1) != 10 || len(tasks2) != 10 {
+		t.Error("Less Tasks found")
+		return
+	}
+	for i := 0; i < 10; i++ {
+		desc := fmt.Sprintf("desc-%d", i)
+		if tasks1[i].Description != desc || tasks2[i].Description != desc {
+			t.Error("Name not matching at index", i)
+		}
 	}
 }

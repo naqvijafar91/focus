@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
@@ -42,17 +43,50 @@ func (ts *TaskService) Create(task *focus.Task) (*focus.Task, error) {
 }
 
 func (ts *TaskService) Update(task *focus.Task) (*focus.Task, error) {
-	return nil, nil
+	// Update single attribute if it is changed
+	taskUpdated := &focus.Task{}
+	err := ts.db.Where("id = ?", task.ID).First(taskUpdated).Error
+	if err != nil {
+		return nil, err
+	}
+	taskUpdated.Description = task.Description
+	taskUpdated.DueDate = task.DueDate
+	taskUpdated.CompletedDate = task.CompletedDate
+	err = ts.db.Save(taskUpdated).Error
+	if err != nil {
+		return nil, err
+	}
+	return taskUpdated, nil
 }
 
 func (ts *TaskService) MarkAsComplete(taskID string) (*focus.Task, error) {
-	return nil, nil
+	taskUpdated := &focus.Task{}
+	err := ts.db.Where("id = ?", taskID).First(taskUpdated).Error
+	if err != nil {
+		return nil, err
+	}
+	taskUpdated.CompletedDate = time.Now()
+	err = ts.db.Save(taskUpdated).Error
+	if err != nil {
+		return nil, err
+	}
+	return taskUpdated, nil
 }
 
 func (ts *TaskService) GetAll() ([]*focus.Task, error) {
-	return nil, nil
+	var tasks []*focus.Task
+	err := ts.db.Find(&tasks).Error
+	if err != nil {
+		return nil, err
+	}
+	return tasks, nil
 }
 
 func (ts *TaskService) GetAllByFolderID(folderID string) ([]*focus.Task, error) {
-	return nil, nil
+	var tasks []*focus.Task
+	err := ts.db.Where("folder_id = ?", folderID).Find(&tasks).Error
+	if err != nil {
+		return nil, err
+	}
+	return tasks, nil
 }
