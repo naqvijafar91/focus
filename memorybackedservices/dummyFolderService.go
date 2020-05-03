@@ -40,3 +40,7 @@ func (dfs *DummyFolderService) GetAll() ([]*focus.Folder, error) {
 func (dfs *DummyFolderService) GetAllByUserID(userID string) ([]*focus.Folder, error) {
 	return dfs.folders, nil
 }
+
+func (dfs *DummyFolderService) FindByID(folderID string) (*focus.Folder, error) {
+	return nil, nil
+}

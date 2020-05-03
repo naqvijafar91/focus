@@ -34,9 +34,8 @@ func createUser(t *testing.T, email string) *focus.User {
 	return user
 }
 
-func createFolder(name string, user *focus.User, fs *FolderService) error {
-	_, err := fs.Create(&focus.Folder{Name: name, UserID: user.ID})
-	return err
+func createFolder(name string, user *focus.User, fs *FolderService) (*focus.Folder, error) {
+	return fs.Create(&focus.Folder{Name: name, UserID: user.ID})
 }
 
 func TestFolderCreate(t *testing.T) {
@@ -78,7 +77,7 @@ func TestGetAll(t *testing.T) {
 	}
 	// Create 10 folders
 	for i := 0; i < 10; i++ {
-		err := createFolder(fmt.Sprintf("name-%d", i), user, fs)
+		_, err := createFolder(fmt.Sprintf("name-%d", i), user, fs)
 		if err != nil {
 			t.Error(err)
 			return
@@ -94,15 +93,31 @@ func TestGetAll(t *testing.T) {
 	}
 }
 
+func TestGetByID(t *testing.T) {
+	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
+	if fs == nil || user == nil {
+		return
+	}
+	folder, err := createFolder(fmt.Sprintf("name-%d", 786), user, fs)
+	fetched, err := fs.FindByID(folder.ID)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if fetched.Name != fmt.Sprintf("name-%d", 786) {
+		t.Error("Failed to fetch by id")
+	}
+}
+
 func TestGetAllByID(t *testing.T) {
-	fs, user1, user2 := createFolderService(t), createUser(t,"xyz@ss.com"), createUser(t,"xya@ss.com")
+	fs, user1, user2 := createFolderService(t), createUser(t, "xyz@ss.com"), createUser(t, "xya@ss.com")
 	if fs == nil || user1 == nil || user2 == nil {
 		return
 	}
 	// Create 10 folders for user 1 and user 2 respectively
 	for i := 0; i < 10; i++ {
-		err := createFolder(fmt.Sprintf("name-%d", i), user1, fs)
-		err = createFolder(fmt.Sprintf("name-%d", i), user2, fs)
+		_, err := createFolder(fmt.Sprintf("name-%d", i), user1, fs)
+		_, err = createFolder(fmt.Sprintf("name-%d", i), user2, fs)
 		if err != nil {
 			t.Error(err)
 			return

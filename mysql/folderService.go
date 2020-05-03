@@ -65,3 +65,12 @@ func (fs *FolderService) GetAllByUserID(userID string) ([]*focus.Folder, error) 
 	}
 	return folders, nil
 }
+
+func (fs *FolderService) FindByID(folderID string) (*focus.Folder, error) {
+	folder := &focus.Folder{}
+	err := fs.db.Where("id = ?", folderID).First(folder).Error
+	if err != nil {
+		return nil, err
+	}
+	return folder, nil
+}
