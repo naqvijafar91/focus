@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/naqvijafar91/focus"
@@ -70,7 +71,47 @@ func TestTaskCreate(t *testing.T) {
 		t.Error("Task not created properly")
 	}
 }
+func TestTaskCreateWithDueDate(t *testing.T) {
+	conn, err := createConnection()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	ts, fs, user := createTaskServiceWithConn(t, conn), createFolderServiceWithConn(t, conn), createUserWithConn(t, "dummsy@xye.com", conn)
+	if ts == nil || fs == nil || user == nil {
+		return
+	}
+	folder, err := createFolder("dummy folder", user, fs)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	dueDate := &focus.Time{time.Now()}
+	ms := dueDate.UnixNano()
+	dueDateFromMS := time.Unix(0, ms)
+	if dueDateFromMS.Local().String() != dueDate.Local().String() {
+		t.Error("Should be same")
+		return
+	}
+	tsk, err := ts.Create(&focus.Task{Description: "Dummy Task", FolderID: folder.ID, DueDate: dueDate})
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	// Using this as we do not have find by id here
+	tasks, _ := ts.GetAllByFolderID(folder.ID)
+	for _, task := range tasks {
+		if task.ID == tsk.ID {
+			if task.Description != "Dummy Task" {
+				t.Error("Task not created properly")
+			}
+			if task.DueDate.Time.Local().String() != dueDate.Time.Local().String() {
+				t.Error("Due dates do not match")
+			}
+		}
+	}
 
+}
 func TestTaskShouldNotCreateWithoutFolderID(t *testing.T) {
 	conn, err := createConnection()
 	if err != nil {

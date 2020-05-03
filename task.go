@@ -1,6 +1,7 @@
 package focus
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -14,7 +15,53 @@ type Time struct {
 	time.Time
 }
 
-// MarshalJSON converts serialized object into json string
+// Value tells the database how to store this type
+func (t *Time) Value() (driver.Value, error) {
+	if t == nil {
+		return nil, nil
+	}
+	var tempTime time.Time
+	tempTime = *&t.Time
+	return tempTime.Local(), nil
+}
+
+// func (t *Time) Value() (driver.Value, error) {
+// 	if t == nil {
+// 		return nil, nil
+// 	}
+// 	i := t.Time.UnixNano()
+// 	return json.Marshal(i)
+// }
+
+// Scan is used by the database to initialize a struct from the value stored in DB
+func (t *Time) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	xType := fmt.Sprintf("%T", value)
+	switch value.(type) {
+	case time.Time:
+		*&t.Time = value.(time.Time).Local()
+	default:
+		fmt.Println("Invalid type found ", xType)
+	}
+
+	return nil
+}
+
+// func (t *Time) Scan(value interface{}) error {
+// 	if value == nil {
+// 		return nil
+// 	}
+// 	var i int64
+// 	if err := json.Unmarshal(value.([]byte), &i); err != nil {
+// 		return err
+// 	}
+// 	t.Time = time.Unix(0, i)
+// 	return nil
+// }
+
+// MarshalJSON converts struct into json string
 func (t Time) MarshalJSON() ([]byte, error) {
 	// ""2020-05-02T00:00:00""
 	formatted := fmt.Sprintf("%02d-%02d-%d",

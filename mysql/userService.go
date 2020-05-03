@@ -16,7 +16,7 @@ type UserService struct {
 
 func NewMysqlConn(host string, port int, username string, dbName string, password string) (*gorm.DB, error) {
 	// user:password@tcp(localhost:5555)/dbname?tls=skip-verify&autocommit=true
-	sqlInfo := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
+	sqlInfo := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true",
 		username, password, host, port, dbName)
 	db, err := gorm.Open("mysql", sqlInfo)
 	if err != nil {
