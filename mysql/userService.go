@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/naqvijafar91/focus"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // UserService - Mysql backed user service
@@ -40,7 +41,12 @@ func NewUserService(db *gorm.DB) (*UserService, error) {
 
 func (us *UserService) Create(user *focus.User) (*focus.User, error) {
 	user.ID = uuid.New().String()
-	err := us.db.Create(user).Error
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.MinCost)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = string(hash)
+	err = us.db.Create(user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -54,4 +60,17 @@ func (us *UserService) FindUserByEmail(email string) (*focus.User, error) {
 		return nil, err
 	}
 	return usr, nil
+}
+
+func (us *UserService) ValidateEmailAndPassword(email, password string) (bool, error) {
+	usr, err := us.FindUserByEmail(email)
+	if err != nil {
+		return false, err
+	}
+	// Hash the password now
+	err = bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(password))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
