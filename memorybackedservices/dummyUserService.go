@@ -28,3 +28,14 @@ func (us *DummyUserService) FindUserByEmail(email string) (*focus.User, error) {
 	}
 	return nil, errors.New("No user Found")
 }
+
+func (us *DummyUserService) ValidateEmailAndPassword(email, password string) (bool, error) {
+	usr, err := us.FindUserByEmail(email)
+	if err != nil {
+		return false, err
+	}
+	if usr.Password != password {
+		return false, nil
+	}
+	return true, nil
+}

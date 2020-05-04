@@ -28,23 +28,27 @@ func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
+	valid, err := handlers.userService.ValidateEmailAndPassword(userLoginReq.Email, userLoginReq.Password)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "Its an error %s", err)
+		return
+	}
+	if !valid {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "Its an error %s", errors.New("Invalid Password"))
+		return
+	}
+	// Since it is a valid user, find and query
 	foundUser, err := handlers.userService.FindUserByEmail(userLoginReq.Email)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
-
-	if foundUser.Password != userLoginReq.Password {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "Its an error %s", errors.New("Invalid password"))
-		return
-	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":       foundUser.ID,
 		"username": foundUser.Email,
-		"password": foundUser.Password,
 	})
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
@@ -53,7 +57,7 @@ func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
 	}
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"token": tokenString,
-		"user":  foundUser})
+		"user":  valid})
 }
 
 func (handlers *Handlers) userRegistration(w http.ResponseWriter, req *http.Request) {
@@ -75,7 +79,6 @@ func (handlers *Handlers) userRegistration(w http.ResponseWriter, req *http.Requ
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":       savedUser.ID,
 		"username": savedUser.Email,
-		"password": savedUser.Password,
 	})
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {

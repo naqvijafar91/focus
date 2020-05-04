@@ -35,7 +35,6 @@ func (fs *FolderService) Update(folder *focus.Folder) (*focus.Folder, error) {
 		return nil, err
 	}
 	folderUpdated.Name = folder.Name
-	folderUpdated.UserID = folder.UserID
 	err = fs.db.Save(folderUpdated).Error
 	if err != nil {
 		return nil, err

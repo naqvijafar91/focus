@@ -70,6 +70,27 @@ func TestUpdateFolder(t *testing.T) {
 	}
 }
 
+func TestUpdateFolderShouldNotUpdateUserID(t *testing.T) {
+	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
+	if fs == nil || user == nil {
+		return
+	}
+	folder, _ := fs.Create(&focus.Folder{Name: "ola", UserID: user.ID})
+	folder.Name = "updated Name"
+	folder.UserID ="Dummy ID"
+	updated, err := fs.Update(folder)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if updated.Name != "updated Name" {
+		t.Error("Name not updated")
+	}
+	if updated.UserID != user.ID {
+		t.Error("Should not update user id of folder")
+	}
+}
+
 func TestGetAll(t *testing.T) {
 	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
 	if fs == nil || user == nil {

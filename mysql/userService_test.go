@@ -71,3 +71,60 @@ func TestNoDuplicateEmail(t *testing.T) {
 		t.Error("Should throw error if duplicate emails are inserted")
 	}
 }
+
+func TestValidateEmailAndPassword(t *testing.T) {
+	usr := createUserService(t)
+	if usr == nil {
+		return
+	}
+	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	if err != nil {
+		t.Error("Should not throw error")
+	}
+	validated, err := usr.ValidateEmailAndPassword("xyz@xx.com", "xxx")
+	if err != nil {
+		t.Error("Should not throw error ", err)
+		return
+	}
+	if !validated {
+		t.Error("Failed to validate with correct credentials")
+	}
+}
+
+func TestShouldNotValidateEmailAndPasswordPart1(t *testing.T) {
+	usr := createUserService(t)
+	if usr == nil {
+		return
+	}
+	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	if err != nil {
+		t.Error("Should not throw error")
+	}
+	validated, err := usr.ValidateEmailAndPassword("xyz@xx.com", "xxy")
+	if err == nil {
+		t.Error("Should throw error if password is different")
+		return
+	}
+	if validated {
+		t.Error("should not validate without correct credentials")
+	}
+}
+
+func TestShouldNotValidateEmailAndPasswordPart2(t *testing.T) {
+	usr := createUserService(t)
+	if usr == nil {
+		return
+	}
+	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	if err != nil {
+		t.Error("Should not throw error")
+	}
+	validated, err := usr.ValidateEmailAndPassword("xyuy@xx.com", "xxx")
+	if err == nil {
+		t.Error("Should throw error if email is different")
+		return
+	}
+	if validated {
+		t.Error("should not validate without correct credentials")
+	}
+}

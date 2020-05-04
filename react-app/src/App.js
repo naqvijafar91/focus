@@ -68,6 +68,9 @@ class App extends Component {
   parseCompleteServerResponse(response) {
     let self = this;
     let folders = response.data;
+    if (!folders) {
+      folders = [];
+    }
     for (let i = 0; i < folders.length; i++) {
       let folder = folders[i];
       for (let j = 0; j < folder.tasks.length; j++) {
@@ -81,6 +84,9 @@ class App extends Component {
   }
 
   parseDate(dateString) {
+    if(!dateString) {
+      return;
+    }
     let parts = dateString.split("-");
     return new Date(parseInt(parts[2], 10),
       parseInt(parts[1], 10) - 1,
@@ -190,6 +196,8 @@ class App extends Component {
       .then(function (done) {
         //Update our state
         const newState = Object.assign({}, self.state);
+        // Subtract remaining tasks
+        newState.data[newState.currentFolderIndexSelected].remaining_tasks--;
         newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
         self.setState(newState);
       }).catch(function (err) {
@@ -198,14 +206,13 @@ class App extends Component {
   }
 
   onTaskDueDateChanged(taskID, dueDate) {
-
     let taskToBeUpdated = null;
     let self = this;
     // Loop through the tasks array and fetch and update task with this id
     // Also fetch the task object for hitting the API
     const updatedTasksForCurrentSelectedFolder = this.state.data[this.state.currentFolderIndexSelected].tasks.map((taskItem) => {
       if (taskItem.id == taskID) {
-        taskItem.dueDate = dueDate;
+        taskItem.due_date = dueDate;
         taskToBeUpdated = taskItem;
       }
       return taskItem;
@@ -236,7 +243,6 @@ class App extends Component {
       due_date : this.extractDateString(updatedTask.due_date),
       completed_date: this.extractDateString(updatedTask.completed_date)
     };
-
     return axios({
       method: "put",
       url: this.baseURL + "/task",
@@ -247,7 +253,7 @@ class App extends Component {
     });
   }
 
-  onNewTaskAdded(taskToBeAdded, dueDate, folderID) {
+  onNewTaskAdded(taskToBeAdded, dueDate) {
     let self = this;
     console.log(taskToBeAdded + ' From App.js adding newTask');
     axios({
@@ -258,14 +264,16 @@ class App extends Component {
       },
       data: {
         "description": taskToBeAdded,
-        "folder_id": folderID,
+        "folder_id": self.state.data[self.state.currentFolderIndexSelected].id,
         // @Todo: Uncomment this once backend is good
         "due_date" : self.extractDateString(dueDate)
       }
     }).then(function (response) {
       //Update our state
       const newState = Object.assign({}, self.state);
-      newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: response.data.id, description: taskToBeAdded, dueDate: dueDate }];
+      // Increment remaining tasks
+      newState.data[newState.currentFolderIndexSelected].remaining_tasks++;
+      newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: response.data.id, description: taskToBeAdded, due_date: dueDate }];
       self.setState(newState);
     }).catch(function (err) {
       alert(err);
@@ -290,6 +298,9 @@ class App extends Component {
     }).then(function (response) {
       console.log(response);
       const newState = Object.assign({}, self.state);
+      if(!newState.data) {
+        newState.data = [];
+      }
       newState.data.push({
         id: response.data.id,
         name: 'New Folder',
@@ -311,7 +322,11 @@ class App extends Component {
   }
 
   render() {
-    const currentSelectedFolderObject = this.state.data[this.state.currentFolderIndexSelected];
+    let data = this.state.data;
+    if (!data) {
+      data = [];
+    }
+    const currentSelectedFolderObject = data[this.state.currentFolderIndexSelected];
     let currentSelectedFolderTasks = [];
     let currentSelectedFolderID = "";
     if (currentSelectedFolderObject) {
@@ -323,7 +338,7 @@ class App extends Component {
         <Helmet>
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
         </Helmet>
-        <Folders data={this.state.data}
+        <Folders data={data}
           currentSelectedFolderID={currentSelectedFolderID}
           addDummyFolderItem={this.addDummyFolderItem}
           updateFolderName={this.updateFolderName}

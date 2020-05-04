@@ -9,4 +9,5 @@ type User struct {
 type UserService interface {
 	Create(user *User) (*User, error)
 	FindUserByEmail(email string) (*User, error)
+	ValidateEmailAndPassword(email, password string) (bool, error)
 }
