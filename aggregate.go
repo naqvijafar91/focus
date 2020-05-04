@@ -1,6 +1,9 @@
 package focus
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type AggregateResponse struct {
 	Data []Data `json:"data"`
@@ -44,10 +47,18 @@ func (agtr *Aggregator) GetAllData(userID string) (*AggregateResponse, error) {
 		if tasksForFolder == nil {
 			tasksForFolder = make([]*Task, 0)
 		}
+		// Find out the remaining tasks in the folder
+		// Remaining tasks = Tasks whose completed date is after the current date or nil
+		remainingTasks := 0
+		for _, task := range tasksForFolder {
+			if task.CompletedDate == nil || task.CompletedDate.After(time.Now()) {
+				remainingTasks++
+			}
+		}
 		response.Data = append(response.Data, Data{
 			FolderID:       folders[i].ID,
 			Name:           folders[i].Name,
-			RemainingTasks: 11,
+			RemainingTasks: remainingTasks,
 			Tasks:          tasksForFolder})
 	}
 	return response, nil
