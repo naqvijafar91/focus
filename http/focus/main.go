@@ -7,6 +7,7 @@ import (
 
 	"github.com/naqvijafar91/focus"
 	"github.com/rs/cors"
+	"github.com/spf13/viper"
 
 	"github.com/naqvijafar91/focus/handlers"
 	"github.com/naqvijafar91/focus/mysql"
@@ -32,7 +33,24 @@ func main() {
 }
 
 func initServices() (focus.UserService, focus.FolderService, focus.TaskService) {
-	db, err := mysql.NewMysqlConn("localhost", 3306, "focus", "focus", "pwd")
+	viper.SetConfigFile("./config.env")
+	viper.SetConfigType("env")  // REQUIRED if the config file does not have the extension in the name
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
+		panic(fmt.Errorf("fatal error config file: %s", err))
+	}
+	viper.SetDefault("dbhost", "localhost")
+	viper.SetDefault("dbport", 3306)
+	viper.SetDefault("dbname", "focus")
+	viper.SetDefault("dbuser", "focus")
+	viper.SetDefault("dbpassword", "pwd")
+
+	dbHost := viper.GetString("dbhost")
+	dbPwd := viper.GetString("dbpassword")
+	dbPort := viper.GetInt("dbport")
+	dbName := viper.GetString("dbname")
+	dbUser := viper.GetString("dbuser")
+	db, err := mysql.NewMysqlConn(dbHost, dbPort, dbUser, dbName, dbPwd)
 	if err != nil {
 		panic(err)
 	}
