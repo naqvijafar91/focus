@@ -41,11 +41,11 @@ func NewUserService(db *gorm.DB) (*UserService, error) {
 
 func (us *UserService) Create(user *focus.User) (*focus.User, error) {
 	user.ID = uuid.New().String()
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.MinCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.LoginCode), bcrypt.MinCost)
 	if err != nil {
 		return nil, err
 	}
-	user.Password = string(hash)
+	user.LoginCode = string(hash)
 	err = us.db.Create(user).Error
 	if err != nil {
 		return nil, err
@@ -62,15 +62,32 @@ func (us *UserService) FindUserByEmail(email string) (*focus.User, error) {
 	return usr, nil
 }
 
-func (us *UserService) ValidateEmailAndPassword(email, password string) (bool, error) {
+func (us *UserService) ValidateEmailAndLoginCode(email, loginCode string) (bool, error) {
 	usr, err := us.FindUserByEmail(email)
 	if err != nil {
 		return false, err
 	}
 	// Hash the password now
-	err = bcrypt.CompareHashAndPassword([]byte(usr.Password), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(usr.LoginCode), []byte(loginCode))
 	if err != nil {
 		return false, err
 	}
 	return true, nil
+}
+
+func (us *UserService) UpdateLoginCode(email, code string) error {
+	usr, err := us.FindUserByEmail(email)
+	if err != nil {
+		return err
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(code), bcrypt.MinCost)
+	if err != nil {
+		return err
+	}
+	usr.LoginCode = string(hash)
+	err = us.db.Save(usr).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }

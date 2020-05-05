@@ -26,7 +26,7 @@ func createUser(t *testing.T, email string) *focus.User {
 	if usr == nil {
 		return nil
 	}
-	user, err := usr.Create(&focus.User{Email: email, Password: "xxx"})
+	user, err := usr.Create(&focus.User{Email: email, LoginCode: "xxx"})
 	if err != nil {
 		t.Error("Should not throw error")
 		return nil

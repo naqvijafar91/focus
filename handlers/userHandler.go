@@ -10,8 +10,9 @@ import (
 	"github.com/naqvijafar91/focus"
 )
 
+// Handlers - Login/Registration would follow the same flow, and it will be a 2 step process everytime
 type Handlers struct {
-	userService focus.UserService
+	userLoginService focus.UserLoginService
 }
 
 //@Todo:Find a way to properly handle errors
@@ -19,7 +20,8 @@ func (handlers *Handlers) sendError(w http.ResponseWriter, err error) {
 
 }
 
-func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
+// verify will check if the code is correct and generate a Bearer token in return
+func (handlers *Handlers) verify(w http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
 	var userLoginReq *focus.User
 	err := decoder.Decode(&userLoginReq)
@@ -28,7 +30,7 @@ func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
-	valid, err := handlers.userService.ValidateEmailAndPassword(userLoginReq.Email, userLoginReq.Password)
+	valid, err := handlers.userLoginService.ValidateLoginCodeForEmail(userLoginReq.Email, userLoginReq.LoginCode)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "Its an error %s", err)
@@ -40,7 +42,7 @@ func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	// Since it is a valid user, find and query
-	foundUser, err := handlers.userService.FindUserByEmail(userLoginReq.Email)
+	foundUser, err := handlers.userLoginService.FindUserByEmail(userLoginReq.Email)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "Its an error %s", err)
@@ -60,7 +62,8 @@ func (handlers *Handlers) userLogin(w http.ResponseWriter, req *http.Request) {
 		"user":  valid})
 }
 
-func (handlers *Handlers) userRegistration(w http.ResponseWriter, req *http.Request) {
+// generate will generate a code and create the user if it not exists and share the code with the user over email
+func (handlers *Handlers) generate(w http.ResponseWriter, req *http.Request) {
 	decoder := json.NewDecoder(req.Body)
 	var user *focus.User
 	err := decoder.Decode(&user)
@@ -69,32 +72,21 @@ func (handlers *Handlers) userRegistration(w http.ResponseWriter, req *http.Requ
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
-	savedUser, err := handlers.userService.Create(user)
+	_, err = handlers.userLoginService.GenerateAndShareCode(user.Email)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":       savedUser.ID,
-		"username": savedUser.Email,
-	})
-	tokenString, error := token.SignedString([]byte("secret"))
-	if error != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Println(error)
-	}
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"token": tokenString,
-		"user":  savedUser})
+		"message": "Please check the email for code"})
 }
 
-func NewHandler(userService focus.UserService) *Handlers {
-	return &Handlers{userService}
+func NewHandler(userLoginService focus.UserLoginService) *Handlers {
+	return &Handlers{userLoginService}
 }
 
 func (handlers *Handlers) RegisterUserRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/user/register", handlers.userRegistration)
-	mux.HandleFunc("/user/login", handlers.userLogin)
+	mux.HandleFunc("/user/generate", handlers.generate)
+	mux.HandleFunc("/user/verify", handlers.verify)
 }
