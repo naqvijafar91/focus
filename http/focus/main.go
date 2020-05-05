@@ -35,7 +35,7 @@ func main() {
 
 func initServices() (focus.UserLoginService, focus.FolderService, focus.TaskService, focus.UserService) {
 	viper.SetConfigFile("./config.env")
-	viper.SetConfigType("env")  // REQUIRED if the config file does not have the extension in the name
+	viper.AutomaticEnv()
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
 		panic(fmt.Errorf("fatal error config file: %s", err))
@@ -51,6 +51,8 @@ func initServices() (focus.UserLoginService, focus.FolderService, focus.TaskServ
 	dbPort := viper.GetInt("dbport")
 	dbName := viper.GetString("dbname")
 	dbUser := viper.GetString("dbuser")
+	emailForSending := viper.GetString("email")
+	emailPwd := viper.GetString("password")
 	db, err := mysql.NewMysqlConn(dbHost, dbPort, dbUser, dbName, dbPwd)
 	if err != nil {
 		panic(err)
@@ -62,7 +64,10 @@ func initServices() (focus.UserLoginService, focus.FolderService, focus.TaskServ
 		panic(err)
 	}
 	codeGenerator := focus.NewFourDigitCodeGenerator()
-	notificationService := email.NewLoginCodeNotificationSender()
+	notificationService, err := email.NewLoginCodeNotificationSender(emailForSending, emailPwd)
+	if err != nil {
+		panic(err)
+	}
 	userLoginService := focus.NewUserLoginService(notificationService, userService, codeGenerator)
 	return userLoginService, folderService, taskService, userService
 }
