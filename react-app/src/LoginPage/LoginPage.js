@@ -90,9 +90,9 @@ class LoginPage extends Component {
                     <div class="form">
                         <form className={this.state.showRegistrationForm ? "register-form" : "hidden"} onSubmit={this.handleSubmitRegister}>
                             <p className={this.state.loginCodeSent ? "" : "hidden"}>Please wait while a login code is being sent to your email id...</p>
-                            <input type="email" placeholder="email" value={this.state.registration_email}
+                            <input disabled={this.state.loginCodeSent?"true":""} type="email" placeholder="email" value={this.state.registration_email}
                                 onChange={this.handleRegistrationEmailChange} />
-                            <button>Login</button>
+                            <button disabled={this.state.loginCodeSent?"true":""}>Login</button>
                         </form>
                         <form className={this.state.showRegistrationForm ? 'hidden' : "login-form"} onSubmit={this.handleSubmitLogin}>
                             <p>Enter the login code sent on your email id.</p>
