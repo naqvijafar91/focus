@@ -10,7 +10,8 @@ class LoginPage extends Component {
         this.state = {
             login_password: '',
             registration_email: '',
-            showRegistrationForm: true 
+            showRegistrationForm: true,
+            loginCodeSent: false
         }
         this.handleLoginPasswordChange = this.handleLoginPasswordChange.bind(this);
         this.handleRegistrationEmailChange = this.handleRegistrationEmailChange.bind(this);
@@ -42,7 +43,7 @@ class LoginPage extends Component {
         }).then(function (response) {
             UserStore.saveUser({ 'user': response.data.user, 'token': response.data.token });
             self.props.history.push('/');
-        }).catch(function(err){
+        }).catch(function (err) {
             alert(err);
         });
     }
@@ -54,6 +55,7 @@ class LoginPage extends Component {
     handleSubmitRegister(event) {
         event.preventDefault();
         let self = this;
+        self.setState({ loginCodeSent: true })
         axios({
             method: 'post',
             url: 'http://localhost:8080/user/generate',
@@ -64,7 +66,8 @@ class LoginPage extends Component {
         }).then(function (response) {
             // Show the login code section
             self.hideRegistrationForm(event);
-        }).catch(function(err){
+        }).catch(function (err) {
+            self.setState({ loginCodeSent: false })
             alert(err);
         });
     }
@@ -85,6 +88,7 @@ class LoginPage extends Component {
                 <div class="login-page">
                     <div class="form">
                         <form className={this.state.showRegistrationForm ? "register-form" : "hidden"} onSubmit={this.handleSubmitRegister}>
+                            <p className={this.state.loginCodeSent ? "" : "hidden"}>Please wait while a login code is being sent to your email id...</p>
                             <input type="email" placeholder="email" value={this.state.registration_email}
                                 onChange={this.handleRegistrationEmailChange} />
                             <button>Login</button>

@@ -1,5 +1,10 @@
 package focus
 
+import (
+	"math/rand"
+	"strconv"
+)
+
 type User struct {
 	ID        string `json:"id"`
 	Email     string `json:"email"`
@@ -89,5 +94,8 @@ func NewFourDigitCodeGenerator() CodeGenerator {
 }
 func (cg *FourDigitCodeGenerator) Generate() string {
 	// We will generate a dummy code for now
-	return "5657"
+	low := 1000
+	high := 9999
+	num := low + rand.Intn(high-low)
+	return strconv.Itoa(num)
 }
