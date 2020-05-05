@@ -8,25 +8,17 @@ class LoginPage extends Component {
     constructor(props, context) {
         super(props, context);
         this.state = {
-            login_email: '',
             login_password: '',
             registration_email: '',
-            registration_password: '',
-            registration_confirmed_password: ''
+            showRegistrationForm: true,
+            loginCodeSent: false
         }
-
-        this.handleLoginEmailChange = this.handleLoginEmailChange.bind(this);
         this.handleLoginPasswordChange = this.handleLoginPasswordChange.bind(this);
         this.handleRegistrationEmailChange = this.handleRegistrationEmailChange.bind(this);
-        this.handleRegistrationPasswordChange = this.handleRegistrationPasswordChange.bind(this);
         this.handleSubmitLogin = this.handleSubmitLogin.bind(this);
         this.handleSubmitRegister = this.handleSubmitRegister.bind(this);
         this.showRegistrationForm = this.showRegistrationForm.bind(this);
         this.hideRegistrationForm = this.hideRegistrationForm.bind(this);
-    }
-
-    handleLoginEmailChange(event) {
-        this.setState({ login_email: event.target.value });
     }
 
     handleLoginPasswordChange(event) {
@@ -37,44 +29,45 @@ class LoginPage extends Component {
         this.setState({ registration_email: event.target.value });
     }
 
-    handleRegistrationPasswordChange(event) {
-        this.setState({ registration_password: event.target.value });
-    }
-
     handleSubmitLogin(event) {
         event.preventDefault();
         let self = this;
         axios({
             method: 'post',
-            url: 'http://localhost:8080/user/login',
+            url: 'http://localhost:8080/user/verify',
             data: {
                 email: this.state.registration_email,
-                password: this.state.registration_password
+                login_code: this.state.login_password
             },
             json: true
         }).then(function (response) {
             UserStore.saveUser({ 'user': response.data.user, 'token': response.data.token });
             self.props.history.push('/');
-        }).catch(function(err){
+        }).catch(function (err) {
             alert(err);
         });
     }
 
+    /**
+     * Just send the email to the server and if successfull show the login code section
+     * @param {event} event 
+     */
     handleSubmitRegister(event) {
         event.preventDefault();
         let self = this;
+        self.setState({ loginCodeSent: true })
         axios({
             method: 'post',
-            url: 'http://localhost:8080/user/register',
+            url: 'http://localhost:8080/user/generate',
             data: {
-                email: this.state.registration_email,
-                password: this.state.registration_password
+                email: this.state.registration_email
             },
             json: true
         }).then(function (response) {
-                UserStore.saveUser({ 'user': response.data.user, 'token': response.data.token });
-                self.props.history.push('/');
-        }).catch(function(err){
+            // Show the login code section
+            self.hideRegistrationForm(event);
+        }).catch(function (err) {
+            self.setState({ loginCodeSent: false })
             alert(err);
         });
     }
@@ -95,20 +88,17 @@ class LoginPage extends Component {
                 <div class="login-page">
                     <div class="form">
                         <form className={this.state.showRegistrationForm ? "register-form" : "hidden"} onSubmit={this.handleSubmitRegister}>
+                            <p className={this.state.loginCodeSent ? "" : "hidden"}>Please wait while a login code is being sent to your email id...</p>
                             <input type="email" placeholder="email" value={this.state.registration_email}
                                 onChange={this.handleRegistrationEmailChange} />
-                            <input type="password" placeholder="password" value={this.state.registration_password}
-                                onChange={this.handleRegistrationPasswordChange} />
-                            <button>create account</button>
-                            <p class="message">Already registered? <a href="#" onClick={this.hideRegistrationForm}>Sign In</a></p>
+                            <button>Login</button>
                         </form>
                         <form className={this.state.showRegistrationForm ? 'hidden' : "login-form"} onSubmit={this.handleSubmitLogin}>
-                            <input type="email" placeholder="email" value={this.login_email}
-                                onChange={this.handleLoginEmailChange} />
-                            <input type="password" placeholder="password" value={this.login_password}
+                            <p>Enter the login code sent on your email id.</p>
+                            <input type="password" placeholder="Login Code" value={this.login_password}
                                 onChange={this.handleLoginPasswordChange} />
                             <button>login</button>
-                            <p class="message">Not registered? <a href="#" onClick={this.showRegistrationForm}>Create an account</a></p>
+                            <p class="message">Login With a Different Email Id? <a href="#" onClick={this.showRegistrationForm}>Change Email ID</a></p>
                         </form>
                     </div>
                 </div>

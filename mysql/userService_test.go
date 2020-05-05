@@ -34,7 +34,7 @@ func TestCreate(t *testing.T) {
 	if usr == nil {
 		return
 	}
-	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", LoginCode: "xxx"})
 	if err != nil {
 		t.Error("Should not throw error")
 	}
@@ -45,7 +45,7 @@ func TestFindUserByEmail(t *testing.T) {
 	if usr == nil {
 		return
 	}
-	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", LoginCode: "xxx"})
 	user, err := usr.FindUserByEmail("xyz@xx.com")
 	if err != nil {
 		t.Error(err)
@@ -61,12 +61,12 @@ func TestNoDuplicateEmail(t *testing.T) {
 	if usr == nil {
 		return
 	}
-	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", LoginCode: "xxx"})
 	if err != nil {
 		t.Error("Should not throw error")
 		return
 	}
-	_, err = usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	_, err = usr.Create(&focus.User{Email: "xyz@xx.com", LoginCode: "xxx"})
 	if err == nil {
 		t.Error("Should throw error if duplicate emails are inserted")
 	}
@@ -77,11 +77,11 @@ func TestValidateEmailAndPassword(t *testing.T) {
 	if usr == nil {
 		return
 	}
-	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", LoginCode: "xxx"})
 	if err != nil {
 		t.Error("Should not throw error")
 	}
-	validated, err := usr.ValidateEmailAndPassword("xyz@xx.com", "xxx")
+	validated, err := usr.ValidateEmailAndLoginCode("xyz@xx.com", "xxx")
 	if err != nil {
 		t.Error("Should not throw error ", err)
 		return
@@ -96,11 +96,11 @@ func TestShouldNotValidateEmailAndPasswordPart1(t *testing.T) {
 	if usr == nil {
 		return
 	}
-	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", LoginCode: "xxx"})
 	if err != nil {
 		t.Error("Should not throw error")
 	}
-	validated, err := usr.ValidateEmailAndPassword("xyz@xx.com", "xxy")
+	validated, err := usr.ValidateEmailAndLoginCode("xyz@xx.com", "xxy")
 	if err == nil {
 		t.Error("Should throw error if password is different")
 		return
@@ -115,11 +115,11 @@ func TestShouldNotValidateEmailAndPasswordPart2(t *testing.T) {
 	if usr == nil {
 		return
 	}
-	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", Password: "xxx"})
+	_, err := usr.Create(&focus.User{Email: "xyz@xx.com", LoginCode: "xxx"})
 	if err != nil {
 		t.Error("Should not throw error")
 	}
-	validated, err := usr.ValidateEmailAndPassword("xyuy@xx.com", "xxx")
+	validated, err := usr.ValidateEmailAndLoginCode("xyuy@xx.com", "xxx")
 	if err == nil {
 		t.Error("Should throw error if email is different")
 		return
