@@ -120,7 +120,7 @@ class App extends Component {
     let self = this;
     axios({
       method: 'get',
-      url: 'http://localhost:8080',
+      url: this.baseURL,
       headers: {
         'Authorization': 'Bearer ' + UserStore.getUser().token,
         'ss': 'sssss'

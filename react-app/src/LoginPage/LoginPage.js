@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './newLoginPage.css';
 import UserStore from './userStore';
 import axios from 'axios';
+import ServerURLFetcher from './../ServerURLFetcher';
 
 class LoginPage extends Component {
 
@@ -34,7 +35,7 @@ class LoginPage extends Component {
         let self = this;
         axios({
             method: 'post',
-            url: 'http://localhost:8080/user/verify',
+            url: ServerURLFetcher.getURL() + '/user/verify',
             data: {
                 email: this.state.registration_email,
                 login_code: this.state.login_password
@@ -58,7 +59,7 @@ class LoginPage extends Component {
         self.setState({ loginCodeSent: true })
         axios({
             method: 'post',
-            url: 'http://localhost:8080/user/generate',
+            url: ServerURLFetcher.getURL()+ '/user/generate',
             data: {
                 email: this.state.registration_email
             },
