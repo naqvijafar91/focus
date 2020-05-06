@@ -39,7 +39,8 @@ func initServices() (focus.UserLoginService, focus.FolderService, focus.TaskServ
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
-		panic(fmt.Errorf("fatal error config file: %s", err))
+		fmt.Println(fmt.Errorf(`Failed to read config file, please make sure all properties are present
+		in the environment variables: %s`, err))
 	}
 	viper.SetDefault("dbhost", "localhost")
 	viper.SetDefault("dbport", 3306)
