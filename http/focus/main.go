@@ -70,7 +70,7 @@ func initServices() (focus.UserLoginService, focus.FolderService, focus.TaskServ
 	if err != nil {
 		panic(err)
 	}
-	userLoginService := focus.NewUserLoginService(notificationService, userService, codeGenerator)
+	userLoginService := focus.NewUserLoginService(notificationService, userService, codeGenerator, folderService)
 	// Figure out port now
 	port := viper.GetInt("port")
 	if port == 0 {

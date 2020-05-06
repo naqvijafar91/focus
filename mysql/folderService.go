@@ -1,6 +1,8 @@
 package mysql
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/naqvijafar91/focus"
@@ -19,22 +21,46 @@ func NewFolderService(db *gorm.DB) (*FolderService, error) {
 	return &FolderService{db}, nil
 }
 func (fs *FolderService) Create(folder *focus.Folder) (*focus.Folder, error) {
-	newFolder := &focus.Folder{ID: uuid.New().String(), Name: folder.Name, UserID: folder.UserID}
-	err := fs.db.Create(newFolder).Error
+	// First check if a inbox folder exists or not, if exists, then append a number at the end
+	verifiedFolder, err := fs.updateFolderNameIfItIsInbox(folder)
+	if err != nil {
+		return nil, err
+	}
+	newFolder := &focus.Folder{ID: uuid.New().String(), Name: verifiedFolder.Name, UserID: folder.UserID}
+	err = fs.db.Create(newFolder).Error
 	if err != nil {
 		return nil, err
 	}
 	return newFolder, nil
 }
 
+func (fs *FolderService) updateFolderNameIfItIsInbox(folder *focus.Folder) (*focus.Folder, error) {
+	inboxFolderExists, err := fs.FindInboxFolder(folder.UserID)
+	if err != nil && err.Error() != "record not found" {
+		return nil, err
+	}
+	if inboxFolderExists != nil && inboxFolderExists.Name == "Inbox" {
+		folder.Name = folder.Name + " 2"
+	}
+	return folder, nil
+}
+
 func (fs *FolderService) Update(folder *focus.Folder) (*focus.Folder, error) {
-	// Update single attribute if it is changed
-	folderUpdated := &focus.Folder{}
-	err := fs.db.Where("id = ?", folder.ID).First(folderUpdated).Error
+	verifiedFolder, err := fs.updateFolderNameIfItIsInbox(folder)
 	if err != nil {
 		return nil, err
 	}
-	folderUpdated.Name = folder.Name
+	// Update single attribute if it is changed
+	folderUpdated := &focus.Folder{}
+	err = fs.db.Where("id = ?", folder.ID).First(folderUpdated).Error
+	if err != nil {
+		return nil, err
+	}
+	// Inbox folder cannot be updated
+	if folderUpdated.Name == "Inbox" {
+		return nil, errors.New("Cannot update Inbox folder")
+	}
+	folderUpdated.Name = verifiedFolder.Name
 	err = fs.db.Save(folderUpdated).Error
 	if err != nil {
 		return nil, err
@@ -63,6 +89,15 @@ func (fs *FolderService) GetAllByUserID(userID string) ([]*focus.Folder, error) 
 		return nil, err
 	}
 	return folders, nil
+}
+
+func (fs *FolderService) FindInboxFolder(userID string) (*focus.Folder, error) {
+	folder := &focus.Folder{}
+	err := fs.db.Where("name = ? and user_id=?", "Inbox", userID).First(folder).Error
+	if err != nil {
+		return nil, err
+	}
+	return folder, nil
 }
 
 func (fs *FolderService) FindByID(folderID string) (*focus.Folder, error) {

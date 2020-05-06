@@ -32,7 +32,7 @@ type UserService interface {
 // code
 type UserLoginService interface {
 	GenerateAndShareCode(email string) (string, error)
-	ValidateLoginCodeForEmail(email, code string) (bool, error)
+	ValidateLoginCodeAndInit(email, code string) (bool, error)
 	FindUserByEmail(email string) (*User, error)
 }
 
@@ -40,12 +40,13 @@ type userLoginService struct {
 	notificationService LoginCodeNotificationService
 	userService         UserService
 	codeGenerator       CodeGenerator
+	folderService       FolderService
 }
 
 // NewUserLoginService constructor for UserLoginService
 func NewUserLoginService(notificationService LoginCodeNotificationService, userService UserService,
-	codeGenerator CodeGenerator) UserLoginService {
-	return &userLoginService{notificationService, userService, codeGenerator}
+	codeGenerator CodeGenerator, folderService FolderService) UserLoginService {
+	return &userLoginService{notificationService, userService, codeGenerator, folderService}
 }
 
 // GenerateAndShareCode will create a user by this email if not exists and also updates the login code
@@ -77,14 +78,48 @@ func (uls *userLoginService) GenerateAndShareCode(email string) (string, error) 
 	return code, nil
 }
 
-// ValidateLoginCodeForEmail this is the 2nd step in the login process
-func (uls *userLoginService) ValidateLoginCodeForEmail(email, code string) (bool, error) {
-	return uls.userService.ValidateEmailAndLoginCode(email, code)
+// ValidateLoginCodeAndInit this is the 2nd step in the login process and it is responsible for initializing
+// defaults for the user if they do not exist
+func (uls *userLoginService) ValidateLoginCodeAndInit(email, code string) (bool, error) {
+	validated, err := uls.userService.ValidateEmailAndLoginCode(email, code)
+	if err != nil {
+		return false, err
+	}
+	if !validated {
+		return false, nil
+	}
+	err = uls.initUser(email)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // Wrapper around FindUserByEmail
 func (uls *userLoginService) FindUserByEmail(email string) (*User, error) {
 	return uls.userService.FindUserByEmail(email)
+}
+
+// initUser - Checks if there is a folder called Inbox present for this user, if not, create it
+func (uls *userLoginService) initUser(email string) error {
+	user, err := uls.userService.FindUserByEmail(email)
+	if err != nil {
+		return err
+	}
+	// Check if inbox folder is present
+	foldersForUser, err := uls.folderService.GetAllByUserID(user.ID)
+	// length will be empty if no records are found, but we can iterate and check if it has the Inbox folder
+	for _, folder := range foldersForUser {
+		if folder.Name == "Inbox" {
+			// Return and do not do anything
+			return nil
+		}
+	}
+	// If we are here, it means that the folder does not exist
+	// Create the Inbox folder
+	inboxFolder := &Folder{Name: "Inbox", UserID: user.ID}
+	_, err = uls.folderService.Create(inboxFolder)
+	return err
 }
 
 type FourDigitCodeGenerator struct{}
