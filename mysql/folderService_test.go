@@ -107,7 +107,31 @@ func TestShouldNotUpdateWithNameInbox(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	if updated.Name != "Inbox 2" {
+	updatedFolder, _ := fs.FindByID(updated.ID)
+	if updatedFolder.Name != "Inbox 2" {
+		t.Error("Name not updated to Inbox 2")
+	}
+}
+
+func TestShouldNotUpdateByIdWithNameInbox(t *testing.T) {
+	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
+	if fs == nil || user == nil {
+		return
+	}
+	_, err := fs.Create(&focus.Folder{Name: "Inbox", UserID: user.ID})
+	if err != nil {
+		t.Error("Folder is nil")
+		return
+	}
+	folder, _ := fs.Create(&focus.Folder{Name: "ola", UserID: user.ID})
+	folder.Name = "Inbox"
+	updated, err := fs.UpdateByID(folder.ID, folder)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	updatedFolder, _ := fs.FindByID(updated.ID)
+	if updatedFolder.Name != "Inbox 2" {
 		t.Error("Name not updated to Inbox 2")
 	}
 }

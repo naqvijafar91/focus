@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
@@ -35,6 +36,12 @@ func (fs *FolderService) Create(folder *focus.Folder) (*focus.Folder, error) {
 }
 
 func (fs *FolderService) updateFolderNameIfItIsInbox(folder *focus.Folder) (*focus.Folder, error) {
+	if strings.Trim(folder.Name, " ") != "Inbox" {
+		return folder, nil
+	}
+	if strings.Trim(folder.UserID, " ") == "" {
+		return nil, errors.New("User ID of folder cannot be empty")
+	}
 	inboxFolderExists, err := fs.FindInboxFolder(folder.UserID)
 	if err != nil && err.Error() != "record not found" {
 		return nil, err
@@ -69,7 +76,15 @@ func (fs *FolderService) Update(folder *focus.Folder) (*focus.Folder, error) {
 }
 
 func (fs *FolderService) UpdateByID(ID string, folder *focus.Folder) (*focus.Folder, error) {
-	folder.ID = ID
+	foundFolder, err := fs.FindByID(ID)
+	if err != nil {
+		return nil, err
+	}
+	// Update the folder's user id with the found folder
+	if foundFolder == nil {
+		return nil, errors.New("record not found")
+	}
+	folder.UserID = foundFolder.UserID
 	return fs.Update(folder)
 }
 
