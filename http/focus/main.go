@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/naqvijafar91/focus"
 	"github.com/rs/cors"
@@ -20,7 +21,7 @@ func main() {
 	// folderService := &memorybackedservices.DummyFolderService{}
 	// userService := &memorybackedservices.DummyUserService{}
 	// taskService := &memorybackedservices.DummyTaskService{}
-	userLoginService, folderService, taskService, userService := initServices()
+	userLoginService, folderService, taskService, userService, port := initServices()
 	handlers.NewFolderHandler(folderService).RegisterFolderRoutes(smux)
 	handlers.NewHandler(userLoginService).RegisterUserRoutes(smux)
 	handlers.NewTaskHandler(taskService).RegisterTaskRoutes(smux)
@@ -30,10 +31,10 @@ func main() {
 	handlers.NewAggregatorHandler(aggregatorService).RegisterAggregatorRoutes(smux)
 	fmt.Println("Server starting")
 	handler := cors.AllowAll().Handler(smux)
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	log.Fatal(http.ListenAndServe(port, handler))
 }
 
-func initServices() (focus.UserLoginService, focus.FolderService, focus.TaskService, focus.UserService) {
+func initServices() (focus.UserLoginService, focus.FolderService, focus.TaskService, focus.UserService, string) {
 	viper.SetConfigFile("./config.env")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig() // Find and read the config file
@@ -69,5 +70,12 @@ func initServices() (focus.UserLoginService, focus.FolderService, focus.TaskServ
 		panic(err)
 	}
 	userLoginService := focus.NewUserLoginService(notificationService, userService, codeGenerator)
-	return userLoginService, folderService, taskService, userService
+	// Figure out port now
+	port := viper.GetInt("port")
+	if port == 0 {
+		port = 8080
+	}
+	fmt.Printf("Starting on port %d\n", port)
+	portStr := ":" + strconv.Itoa(port)
+	return userLoginService, folderService, taskService, userService, portStr
 }
