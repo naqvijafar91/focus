@@ -30,7 +30,7 @@ func (handlers *Handlers) verify(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "Its an error %s", err)
 		return
 	}
-	valid, err := handlers.userLoginService.ValidateLoginCodeForEmail(userLoginReq.Email, userLoginReq.LoginCode)
+	valid, err := handlers.userLoginService.ValidateLoginCodeAndInit(userLoginReq.Email, userLoginReq.LoginCode)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "Its an error %s", err)

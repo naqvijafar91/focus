@@ -53,6 +53,26 @@ func TestFolderCreate(t *testing.T) {
 	}
 }
 
+func TestFolderCreateInboxDuplicate(t *testing.T) {
+	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
+	if fs == nil || user == nil {
+		return
+	}
+	_, err := fs.Create(&focus.Folder{Name: "Inbox", UserID: user.ID})
+	if err != nil {
+		t.Error("Folder is nil")
+		return
+	}
+	folder, err := fs.Create(&focus.Folder{Name: "Inbox", UserID: user.ID})
+	if err != nil {
+		t.Error("Folder is nil")
+		return
+	}
+	if folder.Name != "Inbox 2" || folder.UserID != user.ID {
+		t.Error("Wrong user ID or name")
+	}
+}
+
 func TestUpdateFolder(t *testing.T) {
 	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
 	if fs == nil || user == nil {
@@ -70,6 +90,49 @@ func TestUpdateFolder(t *testing.T) {
 	}
 }
 
+func TestShouldNotUpdateWithNameInbox(t *testing.T) {
+	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
+	if fs == nil || user == nil {
+		return
+	}
+	_, err := fs.Create(&focus.Folder{Name: "Inbox", UserID: user.ID})
+	if err != nil {
+		t.Error("Folder is nil")
+		return
+	}
+	folder, _ := fs.Create(&focus.Folder{Name: "ola", UserID: user.ID})
+	folder.Name = "Inbox"
+	updated, err := fs.Update(folder)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if updated.Name != "Inbox 2" {
+		t.Error("Name not updated to Inbox 2")
+	}
+}
+
+func TestShouldNotUpdateWithInboxWithAnyOtherName(t *testing.T) {
+	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
+	if fs == nil || user == nil {
+		return
+	}
+	folder, err := fs.Create(&focus.Folder{Name: "Inbox", UserID: user.ID})
+	if err != nil {
+		t.Error("Folder is nil")
+		return
+	}
+	folder.Name = "Any random name"
+	updated, err := fs.Update(folder)
+	if err == nil {
+		t.Error("Should throw error")
+		return
+	}
+	if updated != nil {
+		t.Error("Name should not be updated")
+	}
+}
+
 func TestUpdateFolderShouldNotUpdateUserID(t *testing.T) {
 	fs, user := createFolderService(t), createUser(t, "xyz@ss.com")
 	if fs == nil || user == nil {
@@ -77,7 +140,7 @@ func TestUpdateFolderShouldNotUpdateUserID(t *testing.T) {
 	}
 	folder, _ := fs.Create(&focus.Folder{Name: "ola", UserID: user.ID})
 	folder.Name = "updated Name"
-	folder.UserID ="Dummy ID"
+	folder.UserID = "Dummy ID"
 	updated, err := fs.Update(folder)
 	if err != nil {
 		t.Error(err)
@@ -130,7 +193,7 @@ func TestGetByID(t *testing.T) {
 	}
 }
 
-func TestGetAllByID(t *testing.T) {
+func TestGetAllByUserID(t *testing.T) {
 	fs, user1, user2 := createFolderService(t), createUser(t, "xyz@ss.com"), createUser(t, "xya@ss.com")
 	if fs == nil || user1 == nil || user2 == nil {
 		return
@@ -159,5 +222,22 @@ func TestGetAllByID(t *testing.T) {
 		if folders1[i].Name != name || folders2[i].Name != name {
 			t.Error("Name not matching at index", i)
 		}
+	}
+}
+
+func TestGetAllByUserIDShouldNotThrowErrorIfEmpty(t *testing.T) {
+	fs, user1, user2 := createFolderService(t), createUser(t, "xyz@ss.com"), createUser(t, "xya@ss.com")
+	if fs == nil || user1 == nil || user2 == nil {
+		return
+	}
+	folders1, err1 := fs.GetAllByUserID(user1.ID)
+	folders2, err2 := fs.GetAllByUserID(user2.ID)
+	if err1 != nil || err2 != nil {
+		t.Error(err1, err2)
+		return
+	}
+	if len(folders1) != 0 || len(folders2) != 0 {
+		t.Error("Length should be 0")
+		return
 	}
 }

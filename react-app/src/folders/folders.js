@@ -40,7 +40,10 @@ class Folders extends Component {
         });
      }
 
-    showEditButtonForFolder(folderID) {
+    showEditButtonForFolder(folderID,folderName) {
+        if(folderName == "Inbox") {
+            return;
+        }
         this.setState({ ['showEditButton' + folderID]: true});
     }
 
@@ -52,8 +55,8 @@ class Folders extends Component {
         const folders = this.props.data.map((folder) => {
             return <li key={folder.id} 
             className={this.props.currentSelectedFolderID == folder.id?'highlight-selected-folder':''}
-            onMouseEnter={()=>this.showEditButtonForFolder(folder.id)}
-            onMouseLeave={()=>this.hideEditButtonForFolder(folder.id)}
+            onMouseEnter={()=>this.showEditButtonForFolder(folder.id,folder.name)}
+            onMouseLeave={()=>this.hideEditButtonForFolder(folder.id,folder.name)}
             onClick={()=>this.props.onNewFolderSelected(folder.id)}>
                 <div>
                     <span className={this.state['hideName' + folder.id] ? 'hidden' : 'folder-name-text'}>{folder.name}</span>
