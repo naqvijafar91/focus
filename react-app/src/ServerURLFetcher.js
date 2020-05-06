@@ -1,15 +1,13 @@
 
 function ServerURLFetcher() {
-    this.url_dev = "http://localhost:8080";
-    this.url_prod = "http://localhost:8080";
+    this.url = "http://localhost:8080";
+    if(process.env.REACT_APP_URL) {
+        this.url = process.env.REACT_APP_URL;
+    }
 }
 
 ServerURLFetcher.prototype.getURL = function() {
-    if (process.env.REACT_APP_ENV === 'prod') {
-        console.log("This is prod");
-        return this.url_prod;
-    }
-    return this.url_dev;
+    return this.url;
 }
 
 export default new ServerURLFetcher();

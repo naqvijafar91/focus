@@ -56,7 +56,8 @@ class LoginPage extends Component {
     handleSubmitRegister(event) {
         event.preventDefault();
         let self = this;
-        self.setState({ loginCodeSent: true })
+        self.setState({ loginCodeSent: true });
+        console.log(ServerURLFetcher.getURL());
         axios({
             method: 'post',
             url: ServerURLFetcher.getURL()+ '/user/generate',
