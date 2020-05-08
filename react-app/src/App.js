@@ -18,7 +18,7 @@ class App extends Component {
     this.state = {
       data: [],
       currentFolderIndexSelected: 0,
-      showLoader:false
+      showLoader: false
     };
     // {
     //   id: 1,
@@ -59,6 +59,9 @@ class App extends Component {
     this.updateTask = this.updateTask.bind(this);
     this.parseDate = this.parseDate.bind(this);
     this.extractDateString = this.extractDateString.bind(this);
+  }
+
+  componentDidMount() {
     this.fetchLatestDataFromServer();
   }
 
@@ -120,7 +123,7 @@ class App extends Component {
 
   fetchLatestDataFromServer() {
     let self = this;
-    this.setState({showLoader:true});
+    this.setState({ showLoader: true });
     axios({
       method: 'get',
       url: this.baseURL,
@@ -131,11 +134,11 @@ class App extends Component {
     }).then(function (response) {
       console.log(response.data);
       self.setState({ data: self.parseCompleteServerResponse(response.data).data });
-      self.setState({showLoader:false});
+      self.setState({ showLoader: false });
     }).catch(function (err) {
       console.log(err);
       self.setState({ data: [] });
-      self.setState({showLoader:false});
+      self.setState({ showLoader: false });
       alert(err);
     })
   }
@@ -161,7 +164,7 @@ class App extends Component {
         updatedFolder = folder;
       }
     }
-    this.setState({showLoader:true});
+    this.setState({ showLoader: true });
     axios({
       method: 'put',
       url: this.baseURL + '/folder',
@@ -171,9 +174,9 @@ class App extends Component {
       data: updatedFolder
     }).then(function (resp) {
       console.log('Folder updated');
-      self.setState({showLoader:false});
+      self.setState({ showLoader: false });
     }).catch(function (err) {
-      self.setState({showLoader:false});
+      self.setState({ showLoader: false });
       alert(err);
     });
   }
@@ -200,7 +203,7 @@ class App extends Component {
       }
       return true;
     });
-    self.setState({showLoader:true});
+    self.setState({ showLoader: true });
     this.updateTask(taskToBeUpdated)
       .then(function (done) {
         //Update our state
@@ -209,9 +212,9 @@ class App extends Component {
         newState.data[newState.currentFolderIndexSelected].remaining_tasks--;
         newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
         self.setState(newState);
-        self.setState({showLoader:false});
+        self.setState({ showLoader: false });
       }).catch(function (err) {
-        self.setState({showLoader:true});
+        self.setState({ showLoader: true });
         alert(err);
       });
   }
@@ -229,16 +232,16 @@ class App extends Component {
       return taskItem;
     });
     console.log(updatedTasksForCurrentSelectedFolder);
-    self.setState({showLoader:true});
+    self.setState({ showLoader: true });
     this.updateTask(taskToBeUpdated)
       .then(function (done) {
         //Update our state
         const newState = Object.assign({}, self.state);
         newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
         self.setState(newState);
-    self.setState({showLoader:false});
+        self.setState({ showLoader: false });
       }).catch(function (error) {
-        self.setState({showLoader:false});
+        self.setState({ showLoader: false });
         alert(error);
       });
   }
@@ -270,7 +273,7 @@ class App extends Component {
   onNewTaskAdded(taskToBeAdded, dueDate) {
     let self = this;
     console.log(taskToBeAdded + ' From App.js adding newTask');
-    self.setState({showLoader:true});
+    self.setState({ showLoader: true });
     axios({
       url: this.baseURL + '/task',
       method: "post",
@@ -290,9 +293,9 @@ class App extends Component {
       newState.data[newState.currentFolderIndexSelected].remaining_tasks++;
       newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: response.data.id, description: taskToBeAdded, due_date: dueDate }];
       self.setState(newState);
-      self.setState({showLoader:false});
+      self.setState({ showLoader: false });
     }).catch(function (err) {
-      self.setState({showLoader:false});
+      self.setState({ showLoader: false });
       alert(err);
     });
   }
@@ -303,7 +306,7 @@ class App extends Component {
    */
   addDummyFolderItem(notifyChildComponentWithNewID) {
     let self = this;
-    self.setState({showLoader:true});
+    self.setState({ showLoader: true });
     axios({
       method: 'post',
       url: this.baseURL + '/folder',
@@ -328,9 +331,9 @@ class App extends Component {
       self.setState(newState, function () {
         notifyChildComponentWithNewID(response.data.id);
       });
-      self.setState({showLoader:false});
+      self.setState({ showLoader: false });
     }).catch(function (err) {
-      self.setState({showLoader:false});
+      self.setState({ showLoader: false });
       alert(err);
     });
 
