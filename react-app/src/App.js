@@ -200,7 +200,7 @@ class App extends Component {
       }
       return true;
     });
-
+    self.setState({showLoader:true});
     this.updateTask(taskToBeUpdated)
       .then(function (done) {
         //Update our state
@@ -209,7 +209,9 @@ class App extends Component {
         newState.data[newState.currentFolderIndexSelected].remaining_tasks--;
         newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
         self.setState(newState);
+        self.setState({showLoader:false});
       }).catch(function (err) {
+        self.setState({showLoader:true});
         alert(err);
       });
   }
