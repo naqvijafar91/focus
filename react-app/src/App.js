@@ -9,6 +9,7 @@ import Helmet from 'react-helmet';
 import UserStore from './LoginPage/userStore';
 import axios from 'axios';
 import ServerURLFetcher from './ServerURLFetcher';
+import Loader from 'react-loader';
 
 class App extends Component {
   constructor(props, context) {
@@ -16,7 +17,8 @@ class App extends Component {
     this.baseURL = ServerURLFetcher.getURL();
     this.state = {
       data: [],
-      currentFolderIndexSelected: 0
+      currentFolderIndexSelected: 0,
+      showLoader:false
     };
     // {
     //   id: 1,
@@ -84,7 +86,7 @@ class App extends Component {
   }
 
   parseDate(dateString) {
-    if(!dateString) {
+    if (!dateString) {
       return;
     }
     let parts = dateString.split("-");
@@ -100,17 +102,17 @@ class App extends Component {
   extractDateString(dateObj) {
     try {
       let day = dateObj.getDate();
-      if(day<10) {
-        day = "0"+day;
+      if (day < 10) {
+        day = "0" + day;
       }
-      let month = dateObj.getMonth()+1;
-      if(month<10) {
-        month = "0"+month;
+      let month = dateObj.getMonth() + 1;
+      if (month < 10) {
+        month = "0" + month;
       }
       const year = dateObj.getFullYear();
-      const dateStr = day+"-"+month+"-"+year;
+      const dateStr = day + "-" + month + "-" + year;
       return dateStr;
-    } catch(err) {
+    } catch (err) {
       return null;
     }
     return null;
@@ -118,6 +120,7 @@ class App extends Component {
 
   fetchLatestDataFromServer() {
     let self = this;
+    this.setState({showLoader:true});
     axios({
       method: 'get',
       url: this.baseURL,
@@ -128,9 +131,11 @@ class App extends Component {
     }).then(function (response) {
       console.log(response.data);
       self.setState({ data: self.parseCompleteServerResponse(response.data).data });
+      self.setState({showLoader:false});
     }).catch(function (err) {
       console.log(err);
       self.setState({ data: [] });
+      self.setState({showLoader:false});
       alert(err);
     })
   }
@@ -147,6 +152,7 @@ class App extends Component {
 
   //@Todo:Perform an api hit
   updateFolderName(folderID) {
+    let self = this;
     console.log('Performing API HIT to update folder name .... with ID ' + folderID);
     let updatedFolder = null;
     for (var i = 0; i < this.state.data.length; i++) {
@@ -155,6 +161,7 @@ class App extends Component {
         updatedFolder = folder;
       }
     }
+    this.setState({showLoader:true});
     axios({
       method: 'put',
       url: this.baseURL + '/folder',
@@ -164,7 +171,9 @@ class App extends Component {
       data: updatedFolder
     }).then(function (resp) {
       console.log('Folder updated');
+      self.setState({showLoader:false});
     }).catch(function (err) {
+      self.setState({showLoader:false});
       alert(err);
     });
   }
@@ -218,13 +227,16 @@ class App extends Component {
       return taskItem;
     });
     console.log(updatedTasksForCurrentSelectedFolder);
+    self.setState({showLoader:true});
     this.updateTask(taskToBeUpdated)
       .then(function (done) {
         //Update our state
         const newState = Object.assign({}, self.state);
         newState.data[newState.currentFolderIndexSelected].tasks = updatedTasksForCurrentSelectedFolder;
         self.setState(newState);
+    self.setState({showLoader:false});
       }).catch(function (error) {
+        self.setState({showLoader:false});
         alert(error);
       });
   }
@@ -237,10 +249,10 @@ class App extends Component {
   updateTask(updatedTask) {
     // First modify 
     let clonedTask = {
-      id : updatedTask.id,
-      description : updatedTask.description,
+      id: updatedTask.id,
+      description: updatedTask.description,
       folder_id: updatedTask.folder_id,
-      due_date : this.extractDateString(updatedTask.due_date),
+      due_date: this.extractDateString(updatedTask.due_date),
       completed_date: this.extractDateString(updatedTask.completed_date)
     };
     return axios({
@@ -256,6 +268,7 @@ class App extends Component {
   onNewTaskAdded(taskToBeAdded, dueDate) {
     let self = this;
     console.log(taskToBeAdded + ' From App.js adding newTask');
+    self.setState({showLoader:true});
     axios({
       url: this.baseURL + '/task',
       method: "post",
@@ -266,7 +279,7 @@ class App extends Component {
         "description": taskToBeAdded,
         "folder_id": self.state.data[self.state.currentFolderIndexSelected].id,
         // @Todo: Uncomment this once backend is good
-        "due_date" : self.extractDateString(dueDate)
+        "due_date": self.extractDateString(dueDate)
       }
     }).then(function (response) {
       //Update our state
@@ -275,7 +288,9 @@ class App extends Component {
       newState.data[newState.currentFolderIndexSelected].remaining_tasks++;
       newState.data[newState.currentFolderIndexSelected].tasks = [...newState.data[newState.currentFolderIndexSelected].tasks, { id: response.data.id, description: taskToBeAdded, due_date: dueDate }];
       self.setState(newState);
+      self.setState({showLoader:false});
     }).catch(function (err) {
+      self.setState({showLoader:false});
       alert(err);
     });
   }
@@ -286,6 +301,7 @@ class App extends Component {
    */
   addDummyFolderItem(notifyChildComponentWithNewID) {
     let self = this;
+    self.setState({showLoader:true});
     axios({
       method: 'post',
       url: this.baseURL + '/folder',
@@ -298,7 +314,7 @@ class App extends Component {
     }).then(function (response) {
       console.log(response);
       const newState = Object.assign({}, self.state);
-      if(!newState.data) {
+      if (!newState.data) {
         newState.data = [];
       }
       newState.data.push({
@@ -310,7 +326,9 @@ class App extends Component {
       self.setState(newState, function () {
         notifyChildComponentWithNewID(response.data.id);
       });
+      self.setState({showLoader:false});
     }).catch(function (err) {
+      self.setState({showLoader:false});
       alert(err);
     });
 
@@ -335,21 +353,23 @@ class App extends Component {
     }
     return (
       <div id="app-container">
-        <Helmet>
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-        </Helmet>
-        <Folders data={data}
-          currentSelectedFolderID={currentSelectedFolderID}
-          addDummyFolderItem={this.addDummyFolderItem}
-          updateFolderName={this.updateFolderName}
-          handleFolderNameChange={this.handleFolderNameChange}
-          onNewFolderSelected={this.onNewFolderSelected} />
-        <Tasks tasks={currentSelectedFolderTasks}
-          onLogout={this.onLogout}
-          onTaskDueDateChanged={this.onTaskDueDateChanged}
-          onNewTaskAdded={this.onNewTaskAdded}
-          onTaskCompleted={this.onTaskCompleted} />
-      </div>
+        <Loader loaded={!this.state.showLoader}>
+          <Helmet>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+          </Helmet>
+          <Folders data={data}
+            currentSelectedFolderID={currentSelectedFolderID}
+            addDummyFolderItem={this.addDummyFolderItem}
+            updateFolderName={this.updateFolderName}
+            handleFolderNameChange={this.handleFolderNameChange}
+            onNewFolderSelected={this.onNewFolderSelected} />
+          <Tasks tasks={currentSelectedFolderTasks}
+            onLogout={this.onLogout}
+            onTaskDueDateChanged={this.onTaskDueDateChanged}
+            onNewTaskAdded={this.onNewTaskAdded}
+            onTaskCompleted={this.onTaskCompleted} />
+        </Loader>
+      </div >
 
     );
   }
